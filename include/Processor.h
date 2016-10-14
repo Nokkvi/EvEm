@@ -27,7 +27,9 @@ public:
     8Bit_Sub_unsigned(uint8_t n);
     Compare(Register A, Register B);
     RotateLeft(Register A);
+    RotateLeftwc(Register A); //with carry
     RotateRight(Register A);
+    RotateRightwc(Register A); //with carry
     ShiftLeft(Register A);
     ShiftLeft_HL();
     ShiftRight(Register A);
@@ -43,16 +45,16 @@ public:
 };
 
 private:
-    Register A;
-    Register B;
-    Register C;
-    Register D;
-    Register E;
-    Register H;
-    Register L;
-    Register F;
-    Register PC;
-    Register SP;
+    Registers A(8);
+    Registers B(8);
+    Registers C(8);
+    Registers D(8);
+    Registers E(8);
+    Registers H(8);
+    Registers L(8);
+    Registers F(8);
+    Registers PC(16);
+    Registers SP(16);
     unsigned int mClock;
     unsigned int tClock;
 
