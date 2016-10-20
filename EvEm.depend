@@ -1,0 +1,29 @@
+# depslib dependency file v1.0
+1476994071 source:/home/BadWolf/Development/Repos/EvEm/src/Memory.cpp
+	"../include/Memory.h"
+
+1476994736 /home/BadWolf/Development/Repos/EvEm/include/Memory.h
+
+1476994587 source:/home/BadWolf/Development/Repos/EvEm/src/Processor.cpp
+	"../include/Processor.h"
+	"../include/Register.h"
+
+1476994437 /home/BadWolf/Development/Repos/EvEm/include/Processor.h
+	"Register.h"
+	"Definitions.h"
+
+1476994158 /home/BadWolf/Development/Repos/EvEm/include/Register.h
+	"Definitions.h"
+
+1476468527 /home/BadWolf/Development/Repos/EvEm/include/Definitions.h
+	<cstdarg>
+	<cstdlib>
+	<cstdio>
+	<cstring>
+	<stdint.h>
+	<iostream>
+	<fstream>
+
+1476992994 source:/home/BadWolf/Development/Repos/EvEm/src/Register.cpp
+	"../include/Register.h"
+

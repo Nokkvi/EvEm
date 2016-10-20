@@ -1,25 +1,24 @@
 #ifndef PROCESSOR_H
 #define	PROCESSOR_H
 
-#include "definitions.h"
-#include "boot_roms.h"
-#include "register.h"
+#include "Register.h"
+#include "Definitions.h"
 
 class Memory;
 
 class Processor
 {
 private:
-    Register A(1);
-    Register B(1);
-    Register C(1);
-    Register D(1);
-    Register E(1);
-    Register H(1);
-    Register L(1);
-    Register F(1);
-    Register PC(2);
-    Register SP(2);
+    Register* A = new Register(1);
+    Register* B = new Register(1);
+    Register* C = new Register(1);
+    Register* D = new Register(1);
+    Register* E = new Register(1);
+    Register* H = new Register(1);
+    Register* L = new Register(1);
+    Register* F = new Register(1);
+    Register* PC = new Register(2);
+    Register* SP = new Register(2);
     unsigned int mClock;
     unsigned int tClock;
 public:
@@ -49,7 +48,7 @@ public:
         */
 
         void DirectLoad(uint16_t n);                                //Loads from memory location ($uint16_t) into register A.
-        void DirectLoad(Register* X, Register* Y, uint16_t* n);        //Loads from memory locations ($uint16_t) and
+        void DirectLoad(Register* X, Register* Y, uint16_t n);        //Loads from memory locations ($uint16_t) and
                                                                     //($uint16_t+4) into registers X and Y.
         void DirectLoadSP(uint16_t n);                              //Loads from memory location ($uint16_t) into Stack Pointer.
 
@@ -71,8 +70,8 @@ public:
         /   Storing registers in memory
         */
 
-        void Store(Memory Loc, Register* X);     //Loads the contents of register X into memory location ($Loc).
-        void Store(Memory Loc);                 //Loads the contents of register A into memory location ($Loc).
+        void Store(uint16_t loc, Register* X);     //Loads the contents of register X into memory location ($Loc).
+        void Store(uint16_t loc);                 //Loads the contents of register A into memory location ($Loc).
         void Store(Register* X);                     //Loads the contents of register X into memory location (HL).
         void Store();                               //Loads the contents of register A into memory location (HL).
         void StoreValue(uint8_t n);                  //Loads the value n into memory location (HL).
@@ -177,14 +176,14 @@ public:
     /   Bit manipulation
     */
 
-    void BIT(Bit b, Register* X);
-    void BIT(Bit b);
+    //void BIT(Bit b, Register* X);
+    //void BIT(Bit b);
 
-    void SET(Bit b, Register* X);
-    void SET(Bit b);
+    //void SET(Bit b, Register* X);
+    //void SET(Bit b);
 
-    void RES(Bit b, Register* X);
-    void RES(Bit b);
+    //void RES(Bit b, Register* X);
+    //void RES(Bit b);
 
     /*
     /   General purpose Arithmetic and CPU control
@@ -218,11 +217,11 @@ public:
 
 
 
-    Compare(Register* A, Register* B);
-    Push(Register* SP);
-    Pop(Register* SP);
-    ClearCarryFlag(Register* F);
-    Reset(???);
+    //Compare(Register* A, Register* B);
+    //Push(Register* SP);
+    //Pop(Register* SP);
+    //ClearCarryFlag(Register* F);
+    //Reset(???);
 };
 
 #endif	/* PROCESSOR_H */

@@ -3,8 +3,8 @@
 
 Processor::Processor(Memory* pMemory)
 {
-    m_pMemory = pMemory;
-    pMemory->SetProcessor(this);
+    //m_pMemory = pMemory;
+    //pMemory->SetProcessor(this);
 }
 
 Processor::~Processor()
@@ -52,11 +52,11 @@ void Processor::PopXY(Register* X, Register* Y){
 
 }
 
-void Processor::Store(Memory Loc, Register* X){
+void Processor::Store(uint16_t loc, Register* X){
 
 }
 
-void Processor::Store(Memory Loc){
+void Processor::Store(uint16_t loc){
 
 }
 
@@ -77,9 +77,9 @@ void Processor::ADD(Register* X, Register* Y){
     {
         uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
         if(sum > 255)
-            this->F.SetHex(1, 0x1);
+            this->F->SetHex(1, 0x1);
 
-        X->SetByte((uint8_t)(sum / 256));
+        X->SetByte(0, (uint8_t)(sum / 256));
     }
 }
 
@@ -90,7 +90,7 @@ void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
     zw |= ((uint16_t)W->GetByte(0));
     uint32_t sum = (uint32_t)xy + (uint32_t)zw;
     if(sum>65536)
-        this->F.SetHex(1, 0x1);
+        this->F->SetHex(1, 0x1);
 
     X->SetByte(0, (sum & 0xFF00) >> 8);
     Y->SetByte(0, sum & 0x00FF);
@@ -102,15 +102,16 @@ void Processor::ADD(Register* X, Register* Y, Register* ZW){
     xy |= ((uint16_t)Y->GetByte(0));
     uint16_t zw = ((uint16_t)ZW->GetHex(0));
     uint32_t sum = (uint32_t)xy +(uint32_t)zw;
-    if(sum>65536){
-        this->F.SetHex(1, 0x1);
-    }
+    if(sum>65536)
+        this->F->SetHex(1, 0x1);
 }
 
 void Processor::ADD(Register* X, uint8_t n){
     uint16_t sum = (uint16_t)X->GetByte(0) + n;
-    if(sum > 255) this->F.SetHex(1, 0x1);
-    X->setByte((uint8_t)(sum / 256));
+    if(sum > 255)
+        this->F->SetHex(1, 0x1);
+
+    X->SetByte(0, (uint8_t)(sum / 256));
 }
 
 void Processor::ADD(int8_t n){
@@ -291,7 +292,7 @@ void Processor::SRL(){
 
 }
 
-void Processor::BIT(Bit b, Register* X){
+/*void Processor::BIT(Bit b, Register* X){
 
 }
 
@@ -313,7 +314,7 @@ void Processor::RES(Bit b, Register* X){
 
 void Processor::RES(Bit b){
 
-}
+}*/
 
 void Processor::DAA(){
 
