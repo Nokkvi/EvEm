@@ -3,12 +3,14 @@
 
 #include "Register.h"
 #include "Definitions.h"
+#include <unordered_map>
+#include <functional>
 
 class Memory;
 
 class Processor
 {
-private:
+public:
     Register* A = new Register(1);
     Register* B = new Register(1);
     Register* C = new Register(1);
@@ -19,11 +21,18 @@ private:
     Register* F = new Register(1);
     Register* PC = new Register(2);
     Register* SP = new Register(2);
+
+private:
+    std::unordered_map<uint8_t, std::function<void(Processor* p)>>* operations;
     unsigned int mClock;
     unsigned int tClock;
+
 public:
     Processor(Memory* pMemory);
     ~Processor();
+
+    void InitOpcodes();
+    void ProcessOpcode(uint8_t code);
 
 /*
 /   Instruction Sets
@@ -89,7 +98,6 @@ public:
         void ADD(Register* X, Register* Y, Register* ZW);
         void ADD(Register* X, uint8_t n);
         void ADD(int8_t n);
-        void ADD();
 
         void ADC(Register* X);
         void ADC(uint8_t n);

@@ -5,15 +5,25 @@ Processor::Processor(Memory* pMemory)
 {
     //m_pMemory = pMemory;
     //pMemory->SetProcessor(this);
+    InitOpcodes();
 }
 
 Processor::~Processor()
 {
-
+    delete operations;
+    delete A;
+    delete B;
+    delete C;
+    delete D;
+    delete E;
+    delete H;
+    delete L;
+    delete F;
+    delete PC;
+    delete SP;
 }
 
 void Processor::LoadFrom(Register* X){
-
 }
 
 void Processor::LoadFrom(){
@@ -73,13 +83,13 @@ void Processor::StoreValue(uint8_t n){
 }
 
 void Processor::ADD(Register* X, Register* Y){
-    if (X->GetSize() == 8 && Y->GetSize() == 8)
+    if (X->GetSize() == 1 && Y->GetSize() == 1)
     {
         uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
         if(sum > 255)
             this->F->SetHex(1, 0x1);
 
-        X->SetByte(0, (uint8_t)(sum / 256));
+        X->SetByte(0, (uint8_t)(sum & 0x00FF));
     }
 }
 
@@ -115,9 +125,6 @@ void Processor::ADD(Register* X, uint8_t n){
 }
 
 void Processor::ADD(int8_t n){
-}
-
-void Processor::ADD(){
 
 }
 
