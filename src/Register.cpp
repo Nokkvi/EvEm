@@ -1,4 +1,5 @@
 #include "../include/Register.h"
+#include "../include/Memory.h"
 
 Register::Register(int sizeInBytes)
 {

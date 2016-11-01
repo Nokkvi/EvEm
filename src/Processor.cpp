@@ -1,10 +1,11 @@
 #include "../include/Processor.h"
 #include "../include/Register.h"
+#include "../include/Memory.h"
 
 Processor::Processor(Memory* pMemory)
 {
-    //m_pMemory = pMemory;
-    //pMemory->SetProcessor(this);
+    m_pMemory = pMemory;
+    pMemory->SetProcessor(this);
     InitOpcodes();
 }
 
@@ -21,21 +22,53 @@ Processor::~Processor()
     delete F;
     delete PC;
     delete SP;
+    delete M;
+    delete T;
+}
+
+void Processor::Reset(){
+    this->A->SetByte(0, 0x00);
+    this->B->SetByte(0, 0x00);
+    this->C->SetByte(0, 0x00);
+    this->D->SetByte(0, 0x00);
+    this->E->SetByte(0, 0x00);
+    this->H->SetByte(0, 0x00);
+    this->K->SetByte(0, 0x00);
+    this->F->SetByte(0, 0x00);
+    this->PC->SetByte(0, 0x00);
+    this->SP->SetByte(0, 0x00);
+    this->M->SetByte(0, 0x00);
+    this->T->SetByte(0, 0x00);
 }
 
 void Processor::LoadFrom(Register* X){
+    X->SetByte(this->A->GetByte(0));
+    this->T->SetByte(0, 0x04);
+    this->M->SetByte(0, 0x01);
 }
 
 void Processor::LoadFrom(){
-
+    uint16_t P;
+    P = (this->H->GetByte(0)) << 8;
+    P = this->L->GetByte(0);
+    Memory.writeByte(this->A, P);
+    this->T->SetByte(0, 0x08);
+    this->M->SetByte(0, 0x02);
 }
 
 void Processor::LoadTo(Register* X){
-
+    this->A->SetByte(X->GetByte(0));
+    this->T->SetByte(0, 0x04);
+    this->M->SetByte(0, 0x01);
 }
 
 void Processor::LoadTo(){
-
+    uint16_t P;
+    P = (this->H->GetByte(0)) << 8;
+    P = this->L->GetByte(0);
+    Memory.writeByte(P, this->A.GetByte(0));
+    this->T->SetByte(0, 0x08);
+    this->M->SetByte(0, 0x02);
 }
 
 void Processor::DirectLoad(uint16_t n){
@@ -91,6 +124,8 @@ void Processor::ADD(Register* X, Register* Y){
 
         X->SetByte(0, (uint8_t)(sum & 0x00FF));
     }
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
 void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
@@ -105,6 +140,8 @@ void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
     X->SetByte(0, (sum & 0xFF00) >> 8);
     Y->SetByte(0, sum & 0x00FF);
 
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
 void Processor::ADD(Register* X, Register* Y, Register* ZW){
@@ -114,6 +151,12 @@ void Processor::ADD(Register* X, Register* Y, Register* ZW){
     uint32_t sum = (uint32_t)xy +(uint32_t)zw;
     if(sum>65536)
         this->F->SetHex(1, 0x1);
+
+    X->SetByte(0, (sum & 0xFF00) >> 8);
+    Y->SetByte(0, sum & 0x00FF);
+
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
 void Processor::ADD(Register* X, uint8_t n){
@@ -121,11 +164,17 @@ void Processor::ADD(Register* X, uint8_t n){
     if(sum > 255)
         this->F->SetHex(1, 0x1);
 
-    X->SetByte(0, (uint8_t)(sum / 256));
+    X->SetByte(0, (uint8_t) (sum & 0x00FF));
+
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
-void Processor::ADD(int8_t n){
+void Processor::ADD(Register* SP, int8_t n){
+    uint8_t temp = memory->ReadByte();
 
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
 void Processor::ADC(Register* X){
@@ -349,6 +398,8 @@ void Processor::SCF(){
 
 void Processor::NOP(){
     //No operation
+    T->SetByte(0, 0x04);
+    M->SetByte(0, 0x01);
 }
 
 void Processor::HALT(){
