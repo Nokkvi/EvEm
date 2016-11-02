@@ -21,6 +21,10 @@ public:
     Register* PC = new Register(2);
     Register* SP = new Register(2);
 
+    //Clock registers
+    Register* M = new Register(1);
+    Register* T = new Register(1);
+
 private:
     std::unordered_map<uint8_t, std::function<void(Processor* p, unsigned int* m, unsigned int* t)>>* operations;
     unsigned int mClock;
@@ -174,7 +178,7 @@ public:
         void ADD(Register* X, Register* Y, Register* Z, Register* W);
         void ADD(Register* X, Register* Y, Register* ZW);
         void ADD(Register* X, uint8_t n);
-        void ADD(int8_t n);
+        void ADD(Register* SP, int8_t n);
 
         void ADC(Register* X);
         void ADC(uint8_t n);
@@ -306,7 +310,7 @@ public:
     //Push(Register* SP);
     //Pop(Register* SP);
     //ClearCarryFlag(Register* F);
-    //Reset(???);
+    void Reset();
 };
 
 #endif	/* PROCESSOR_H */

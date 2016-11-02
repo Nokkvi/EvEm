@@ -26,7 +26,7 @@ class Memory
             storage[index] = value;
         };
 
-        inline void SetByte(uint16_t index, uint16_t value)
+        inline void SetWord(uint16_t index, uint16_t value)
         {
             storage[index] = ((uint8_t)value);
             storage[index + 1] = ((uint8_t)(value >> 8));
