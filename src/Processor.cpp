@@ -286,17 +286,14 @@ void Processor::Pop(Register* SP, Register* X, Register* Y) {
 
 
 void Processor::ADD(Register* X, Register* Y){
-    if (X->GetSize() == 1 && Y->GetSize() == 1)
-    {
-        uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
-        if(sum > 255)
-            this->F->SetHex(1, 0x1);
+    uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
+    this.FlagHelper(sum, 0);
+    if(sum > 255)
+        this->F->SetHex(1, 0x1);
 
-        X->SetByte(0, (uint8_t)(sum & 0x00FF));
-        this->M->SetByte(0, 0x01);
-        this->T->SetByte(0, 0x04);
-
-    }
+    X->SetByte(0, (uint8_t)(sum & 0x00FF));
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
@@ -305,7 +302,7 @@ void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
     uint16_t zw = ((uint16_t)Z->GetByte(0)) << 8;
     zw |= ((uint16_t)W->GetByte(0));
     uint32_t sum = (uint32_t)xy + (uint32_t)zw;
-    if(sum>65536)
+    if(sum>65535)
         this->F->SetHex(1, 0x1);
 
     X->SetByte(0, (sum & 0xFF00) >> 8);
@@ -313,26 +310,31 @@ void Processor::ADD(Register* X, Register* Y, Register* Z, Register* W) {
 
     this->M->SetByte(0, 0x01);
     this->T->SetByte(0, 0x04);
-
 }
 
 void Processor::ADD(Register* X, Register* Y, Register* ZW){
     uint16_t xy = ((uint16_t)X->GetByte(0)) << 8;
+
     xy |= ((uint16_t)Y->GetByte(0));
     uint16_t zw = ((uint16_t)ZW->GetHex(0));
     uint32_t sum = (uint32_t)xy +(uint32_t)zw;
     if(sum>65536)
         this->F->SetHex(1, 0x1);
+
+    X->SetByte(0, (sum & 0xFF00) >> 8);
+    Y->SetByte(0, sum & 0x00FF);
+
     this->M->SetByte(0, 0x03);
-    this->T->SetByte(0, 0x012S);
+    this->T->SetByte(0, 0x012);
 }
 
 void Processor::ADD(Register* X, uint8_t n){
     uint16_t sum = (uint16_t)X->GetByte(0) + n;
+    this.FlagHelper(sum, 0);
     if(sum > 255)
         this->F->SetHex(1, 0x1);
 
-    X->SetByte(0, (uint8_t)(sum / 256));
+    X->SetByte(0, (uint8_t)(sum & 0x00FF));
 
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
@@ -353,48 +355,127 @@ void Processor::ADD(Register* SP, int8_t n){
 }
 
 //adds the content of register X with the contents of memory location (HL)
+void Processor::ADDHL(Register* X, Register* H, Register* L){
+    uint16_t temp = H->GetByte(0) << 8;
+    temp = L->GetByte(0);
+    uint16_t sum = X->GetByte(0);
+    sum += this->memory->GetByte(temp);
+    this.FlagHelper(sum, 0);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
+void Processor::ADC(Register* X, Register* Y){
+    uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 0);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
+}
+
+void Processor::ADC(Register* X, uint8_t n){
+    uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 0);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
 void Processor::ADC(Register* X, Register* H, Register* L){
     uint16_t temp = H->GetByte(0) << 8;
     temp = L->GetByte(0);
     uint16_t sum = X->GetByte(0);
     sum += this->memory->GetByte(temp);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 0);
     if(sum > 255)
         this->F->SetHex(0, 0x1);
-    X->SetByte(0, sum);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-void Processor::ADC(uint8_t n){
+void Processor::SUB(Register* X, Register* Y){
+    uint16_t sum = (uint16_t)X->GetByte(0) - (uint16_t)Y->GetByte(0);
+    this.FlagHelper(sum, 1);
+    if(sum > 255)
+        this->F->SetHex(1, 0x1);
 
+    X->SetByte(0, (uint8_t)(sum & 0x00FF));
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
-void Processor::ADC(){
+void Processor::SUB(Register* X, uint8_t n){
+    uint16_t sum = (uint16_t)X->GetByte(0) - n;
+    this.FlagHelper(sum, 1);
+    if(sum > 255)
+        this->F->SetHex(1, 0x1);
 
+    X->SetByte(0, (uint8_t)(sum & 0x00FF));
+
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::SUB(Register* X){
-
+void Processor::SUB(Register* A, Register* H, Register* L){
+    uint16_t temp = H->GetByte(0) << 8;
+    temp = L->GetByte(0);
+    uint16_t sum = X->GetByte(0);
+    sum -= this->memory->GetByte(temp);
+    this.FlagHelper(sum, 0);
+    if(sum > 65535)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::SUB(uint8_t n){
-
+void Processor::SBC(Register* X, Register* Y){
+    uint16_t sum = (uint16_t)X->GetByte(0) - (uint16_t)Y->GetByte(0);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 1);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
-void Processor::SUB(){
-
+void Processor::SBC(Register* X, uint8_t n){
+    uint16_t sum = (uint16_t)X->GetByte(0) - (uint16_t)Y->GetByte(0);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 1);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::SBC(Register* X){
+void Processor::SBC(Register* X, Register* H, Register* L){
+    uint16_t temp = H->GetByte(0) << 8;
+    temp = L->GetByte(0);
+    uint16_t sum = X->GetByte(0);
+    sum -= this->memory->GetByte(temp);
+    sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
+    this.FlagHelper(sum, 0);
+    if(sum > 255)
+        this->F->SetHex(0, 0x1);
+    X->SetByte(0, (uint8_t)sum & 0x00FF);
 
-}
-
-void Processor::SBC(uint8_t n){
-
-}
-
-void Processor::SBC(){
-
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
 void Processor::AND(Register* X){
@@ -445,18 +526,29 @@ void Processor::CP(){
 }
 
 void Processor::INC(Register* X){
+    this.ADD(X, 1);
+}
+
+void Processor::INC(Register* X, Register* Y){
 
 }
 
-void Processor::INC(){
-
+void Processor::INC(Register* H, Register* L){
 }
 
 void Processor::DEC(Register* X){
-
+    this.SUB(X, 1);
 }
 
-void Processor::DEC(){
+void Processor::DEC(Register* X, Register* Y){
+    Y->SetByte(0, Y->GetByte(0)+1);
+    if(Y->GetByte(0)==0)
+        X->SetByte(0, X->GetByte(0)+1);
+    if((X->GetByte(0)==0)&(Y->GetByte(0)==0=)
+        this->F->SetByte(0, 0x10);
+}
+
+void Processor::DECHL(Register* H, Register* L){
 
 }
 
@@ -598,4 +690,11 @@ void Processor::DI(){
 
 void Processor::EI(){
 
+}
+
+void Processor::FlagHelper(uint16_t n, int as){
+    this->F->SetByte(0, 0x0);
+    if(!(n&255))
+        this->F->SetByte(0, this->F->GetByte(0)|=128);
+    this->F->SetByte(0, this->F->GetByte(0)|= as ? 0x40 : 0);
 }
