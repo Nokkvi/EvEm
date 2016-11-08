@@ -25,6 +25,10 @@ public:
     Register* M = new Register(1);
     Register* T = new Register(1);
 
+    int _halt;
+    int _ime;
+    int _stop;
+
 private:
     std::unordered_map<uint8_t, std::function<void(Processor* p, unsigned int* m, unsigned int* t)>>* operations;
     unsigned int mClock;
@@ -189,25 +193,25 @@ public:
         void SUB(Register* X, uint8_t n);
         void SUB(Register* A, Register* H, Register* L);
 
-        void SBC(Register* X);
-        void SBC(uint8_t n);
-        void SBC();
+        void SBC(Register* X, Register* Y);
+        void SBC(Register* X, uint8_t n);
+        void SBC(Register* X, Register* H, Register* L);
 
         void AND(Register* X);
         void AND(uint8_t n);
-        void AND();
+        void AND(Register* H, Register* L);
 
         void OR(Register* X);
         void OR(uint8_t n);
-        void OR();
+        void OR(Register* H, Register* L);
 
         void XOR(Register* X);
         void XOR(uint8_t n);
-        void XOR();
+        void XOR(Register* H, Register* L);
 
-        void CP(Register* X);
-        void CP(uint8_t n);
-        void CP();
+        void CP(Register* X, Register* Y);
+        void CP(Register* X, uint8_t n);
+        void CP(Register* X, Register* H, Register* L);
 
         void INC(Register* X);
         void INC(Register* X, Register* Y);
@@ -301,6 +305,8 @@ public:
     void DI();
 
     void EI();
+
+    void XX();
 
 
 

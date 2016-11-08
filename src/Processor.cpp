@@ -7,6 +7,9 @@ Processor::Processor(Memory* memory)
     this->memory = memory;
     //pMemory->SetProcessor(this);
     InitOpcodes();
+
+    this->_halt = 0;
+    this->_ime = 0;
 }
 
 Processor::~Processor()
@@ -32,12 +35,16 @@ void Processor::Reset(){
     this->D->SetByte(0, 0x00);
     this->E->SetByte(0, 0x00);
     this->H->SetByte(0, 0x00);
-    this->K->SetByte(0, 0x00);
+    this->L->SetByte(0, 0x00);
     this->F->SetByte(0, 0x00);
     this->PC->SetByte(0, 0x00);
     this->SP->SetByte(0, 0x00);
     this->M->SetByte(0, 0x00);
     this->T->SetByte(0, 0x00);
+
+    this->_halt = 0;
+    this->_ime = 1;
+    this->_stop = 0;
 }
 
 // Loading into register r the contents of memory address (0xFFn)%.
@@ -68,8 +75,8 @@ void Processor::Load(Register* r, Register* X) {
 register pair xy %*/
 void Processor::Load(Register* r, Register* X, Register* Y){
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
-    r->SetByte(this->memory->GetByte(temp));
+    temp += Y->GetByte(0);
+    r->SetByte(0, this->memory->GetByte(temp));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
@@ -78,8 +85,8 @@ void Processor::Load(Register* r, Register* X, Register* Y){
 register pair xy, simultaneously incrememnt the contents of HL.%*/
 void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
-    r->SetByte(this->memory->GetByte(temp));
+    temp += Y->GetByte(0);
+    r->SetByte(0, this->memory->GetByte(temp));
     temp++;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
     Y->SetByte(0, (uint8_t)(temp & 0x00FF));
@@ -91,8 +98,8 @@ void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
 register pair XY, then decrementing the pair XY.%*/
 void Processor::Load_Decrement(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
-    r->SetByte(this->memory->GetByte(temp));
+    temp += Y->GetByte(0);
+    r->SetByte(0, this->memory->GetByte(temp));
     temp--;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
     Y->SetByte(0, (uint8_t)(temp & 0x00FF));
@@ -148,7 +155,7 @@ void Processor::Store(Register* r, Register* X){
 // Stores the contents of register r in memory specified by register pair xy.%
 void Processor::Store(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    temp += Y->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
@@ -159,7 +166,7 @@ void Processor::Store(Register* r, Register* X, Register* Y) {
 simultaneously increment the contents of xy.%*/
 void Processor::Store_Increment(Register* r, Register* X, Register* Y){
     uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    temp += Y->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
     temp++;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
@@ -172,7 +179,7 @@ void Processor::Store_Increment(Register* r, Register* X, Register* Y){
 simultaneously decrement the contents of xy.%*/
 void Processor::Store_Decrement(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    temp += Y->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
     temp--;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
@@ -186,7 +193,7 @@ void Processor::Store_Decrement(Register* r, Register* X, Register* Y) {
 // Loads 8-bit immediate data n into memory specified by register pair xy.%
 void Processor::Store(Register* X, Register* Y, uint8_t n) {
     uint16_t temp = X->GetByte(0) << 8;
-    Y->GetByte(0);
+    temp += Y->GetByte(0);
     this->memory->SetByte(temp, n);
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
@@ -213,7 +220,7 @@ void Processor::Load(Register* X, Register* Y, uint16_t nn){
 // The 8-bit operand e is added to SP and the result is stored in HL.%
 void Processor::Load(Register* SP, Register* X, Register* Y, uint8_t e) {
     uint16_t temp = SP->GetByte(1) << 8;
-    temp = SP->GetByte(0);
+    temp += SP->GetByte(0);
     temp += e;
     X->SetByte(0, temp >> 8);
     Y->SetByte(0, temp & 0x00FF);
@@ -239,7 +246,7 @@ void Processor::Store_SP(Register* SP, uint16_t nn){
 /*From Registers*/
 
 // Load the contents of register pair HL(not the memory location) in stack pointer SP.%
-void Processor::Load(Register* X, Register* Y, Register* SP) {
+void Processor::LoadSP(Register* X, Register* Y, Register* SP) {
     X->SetByte(0, (SP->GetByte(1)));
     Y->SetByte(0, (SP->GetByte(0)));
     this->M->SetByte(0, 0x02);
@@ -255,7 +262,7 @@ the stack. The contents of the lower portion of qq are then placed on the
 stack. The contents of SP are automatically decremented by 2.*/
 void Processor::Push(Register* SP, Register* X, Register* Y){
     uint16_t temp = SP->GetByte(1) << 8;
-    temp = SP->GetByte(0);
+    temp += SP->GetByte(0);
     temp--;
     this->memory->SetByte(temp, X->GetByte(0));
     temp--;
@@ -273,7 +280,7 @@ contents of the memory they specify are loaded in the upper portion of qq.
 The contents of SP are automatically incremented by 2.*/
 void Processor::Pop(Register* SP, Register* X, Register* Y) {
     uint16_t temp = SP->GetByte(1) << 8;
-    temp = SP->GetByte(0);
+    temp += SP->GetByte(0);
     X->SetByte(0, this->memory->GetByte(SP->GetByte(0)));
     temp++
     Y->SetByte(0, this->memory->GetByte(SP->GetByte(0)));
@@ -357,7 +364,7 @@ void Processor::ADD(Register* SP, int8_t n){
 //adds the content of register X with the contents of memory location (HL)
 void Processor::ADDHL(Register* X, Register* H, Register* L){
     uint16_t temp = H->GetByte(0) << 8;
-    temp = L->GetByte(0);
+    temp += L->GetByte(0);
     uint16_t sum = X->GetByte(0);
     sum += this->memory->GetByte(temp);
     this.FlagHelper(sum, 0);
@@ -392,7 +399,7 @@ void Processor::ADC(Register* X, uint8_t n){
 
 void Processor::ADC(Register* X, Register* H, Register* L){
     uint16_t temp = H->GetByte(0) << 8;
-    temp = L->GetByte(0);
+    temp += L->GetByte(0);
     uint16_t sum = X->GetByte(0);
     sum += this->memory->GetByte(temp);
     sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
@@ -430,7 +437,7 @@ void Processor::SUB(Register* X, uint8_t n){
 
 void Processor::SUB(Register* A, Register* H, Register* L){
     uint16_t temp = H->GetByte(0) << 8;
-    temp = L->GetByte(0);
+    temp += L->GetByte(0);
     uint16_t sum = X->GetByte(0);
     sum -= this->memory->GetByte(temp);
     this.FlagHelper(sum, 0);
@@ -465,7 +472,7 @@ void Processor::SBC(Register* X, uint8_t n){
 
 void Processor::SBC(Register* X, Register* H, Register* L){
     uint16_t temp = H->GetByte(0) << 8;
-    temp = L->GetByte(0);
+    temp += L->GetByte(0);
     uint16_t sum = X->GetByte(0);
     sum -= this->memory->GetByte(temp);
     sum+=(uint16_t)(this->F->GetByte(0)&0x10)!=0 ? 1 : 0;
@@ -479,50 +486,115 @@ void Processor::SBC(Register* X, Register* H, Register* L){
 }
 
 void Processor::AND(Register* X){
-
+    uint16_t result = this->A->GetByte(0)&X->GetByte(0);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::AND(uint8_t n){
-
+    uint16_t result = this->A->GetByte(0)&n;
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::AND(){
-
+void Processor::AND(Register* H, Register* L){
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    uint16_t result = (uint16_t)this->A->GetByte(0)&this->memory->GetByte(n);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
 void Processor::OR(Register* X){
-
+    uint16_t result = this->A->GetByte(0)|X->GetByte(0);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::OR(uint8_t n){
-
+    uint16_t result = this->A->GetByte(0)|n;
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::OR(){
-
+void Processor::OR(Register* H, Register* L){
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    uint16_t result = (uint16_t)this->A->GetByte(0)|this->memory->GetByte(n);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
 void Processor::XOR(Register* X){
-
+    uint16_t result = this->A->GetByte(0)^X->GetByte(0);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::XOR(uint8_t n){
-
+    uint16_t result = this->A->GetByte(0)^n;
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::XOR(){
-
+void Processor::XOR(Register* H, Register* L){
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    uint16_t result = (uint16_t)this->A->GetByte(0)^this->memory->GetByte(n);
+    this.FlagHelper(result, 0);
+    this->A->SetByte(0, (uint8_t)result & 0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::CP(Register* X){
-
+void Processor::CP(Register* X, Register* Y){
+    uint16_t n = X->GetByte(0);
+    n -= Y->GetByte(0);
+    this.FlagHelper(n, 1);
+    if(n>255)
+        this.F->SetByte(0, 0x10);
+    n&=(0x00FF);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
-void Processor::CP(uint8_t n){
-
+void Processor::CP(Register* X, uint8_t n){
+    uint16_t x = X->GetByte(0);
+    x -= n;
+    this.FlagHelper(n, 1);
+    if(n>255)
+        this.F->SetByte(0, 0x10);
+    n&=(0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
-void Processor::CP(){
-
+void Processor::CP(Register* X, Register* H, Register* L){
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    uint16_t x = X->GetByte(0);
+    x -= this->memory->GetByte(n);
+    this.FlagHelper(n, 1);
+    if(n>255)
+        this.F->SetByte(0, 0x10);
+    n&=(0x00FF);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
 void Processor::INC(Register* X){
@@ -530,10 +602,21 @@ void Processor::INC(Register* X){
 }
 
 void Processor::INC(Register* X, Register* Y){
-
+    Y->SetByte(0, Y->GetByte(0)+1);
+    if(Y->GetByte(0)==0)
+        X->SetByte(0, X->GetByte(0)+1);
+    if((X->GetByte(0)==0)&(Y->GetByte(0)==0)
+        this->F->SetByte(0, 0x10);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::INC(Register* H, Register* L){
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    this->memory->SetByte(n, this->memory->GetByte(0)+1);
+    this->M->SetByte(0, 0x03);
+    this->T->SetByte(0, 0x12);
 }
 
 void Processor::DEC(Register* X){
@@ -541,19 +624,31 @@ void Processor::DEC(Register* X){
 }
 
 void Processor::DEC(Register* X, Register* Y){
-    Y->SetByte(0, Y->GetByte(0)+1);
-    if(Y->GetByte(0)==0)
-        X->SetByte(0, X->GetByte(0)+1);
-    if((X->GetByte(0)==0)&(Y->GetByte(0)==0=)
+    Y->SetByte(0, Y->GetByte(0)-1);
+    if(Y->GetByte(0)==255)
+        X->SetByte(0, X->GetByte(0)-1);
+    if((X->GetByte(0)==255)&(Y->GetByte(0)==255)
         this->F->SetByte(0, 0x10);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::DECHL(Register* H, Register* L){
-
+    uint16_t n = H->GetByte(0) << 8;
+    n += L->GetByte(0);
+    this->memory->SetByte(n, this->memory->GetByte(0)-1);
+    this->M->SetByte(0, 0x03);
+    this->T->SetByte(0, 0x12);
 }
 
 void Processor::RLCA(){
-
+    uint8_t ci = if(this->A->GetByte(0)&0x80) ? 1 : 0;
+    uint8_t co = if(this->A->GetByte(0)&0x80) ? 0x10 : 0;
+    this->A->SetByte(0, (this->A->GetByte() << 1)+ci);
+    this->A->SetByte(0, this->A->GetByte(0)&255);
+    this->F->SetByte(0, (this->F->GetByte(0)&0xEF)+co);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::RLC(Register* X){
@@ -561,15 +656,29 @@ void Processor::RLC(Register* X){
 }
 
 void Processor::RLC(){
-
+    uint8_t ci = if(this->F->GetByte(0)&0x10) ? 1 : 0;
+    uint8_t co = if(this->F->GetByte(0)&0x10) ? 1 : 0;
 }
 
 void Processor::RLA(){
-
+    uint8_t ci = if(this->F->GetByte(0)&0x10) ? 1 : 0;
+    uint8_t co = if(this->A->GetByte(0)&0x80) ? 1 : 0;
+    this->A->SetByte(0, (this->A->GetByte() << 1)+ci);
+    this->A->SetByte(0, this->A->GetByte(0)&255);
+    this->F->SetByte(0, (this->F->GetByte(0)&0xEF)+co);
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::RL(Register* X){
-
+    uint8_t ci = if(this->F->GetByte(0)&0x10) ? 1 : 0;
+    uint8_t co = if(X->GetByte(0)&0x80) ? 1 : 0;
+    X->SetByte(0, (X->GetByte() << 1)+ci);
+    X->SetByte(0, X->GetByte(0)&255);
+    this.FlagHelper((uint16_t)X->GetByte(0), 0);
+    this->F->SetByte(0, (this->F->GetByte(0)&0xEF)+co);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
 }
 
 void Processor::RL(){
@@ -673,11 +782,14 @@ void Processor::SCF(){
 }
 
 void Processor::NOP(){
-    //No operation
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::HALT(){
-
+    this._halt = 1;
+    this->M->SetByte(0, 0x01);
+    this->T->SetByte(0, 0x04);
 }
 
 void Processor::STOP(){
@@ -690,6 +802,9 @@ void Processor::DI(){
 
 void Processor::EI(){
 
+}
+
+void Processor::XX(){
 }
 
 void Processor::FlagHelper(uint16_t n, int as){
