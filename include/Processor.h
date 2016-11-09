@@ -128,7 +128,7 @@ public:
         //Immediate Data
 
             // Load two bytes of immediate data to register pair xy.
-			void Load16(uint8_t n, uint8_t m, Register* X, Register* Y);
+			void Load(Register* X, Register* Y, uint16_t nn);
 
         //From Stack Pointer
 
