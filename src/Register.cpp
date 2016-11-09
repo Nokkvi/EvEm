@@ -15,7 +15,6 @@ int Register::GetSize()
 {
     return size;
 }
-
 bool Register::Increment()
 {
     for (int i = 0; i < size; i++)

@@ -14,6 +14,7 @@ uint8_t Processor::FetchInstruction()
 void Processor::ProcessOpcode(uint8_t code)
 {
     (*operations)[code](this);
+<<<<<<< HEAD
     if (this->cbInstruction)
     {
         this->cbInstruction = false;
@@ -24,6 +25,7 @@ void Processor::ProcessOpcode(uint8_t code)
     this->tTotal += this->T->GetByte(0);
 }
 
+<<<<<<< HEAD
 uint8_t Processor::Get8BitImmediate()
 {
     uint16_t pc = this->PC->GetWord(0);
@@ -37,6 +39,19 @@ uint16_t Processor::Get16BitImmediate()
     this->PC->Increment();
     this->PC->Increment();
     return this->memory->GetWord(pc);
+=======
+        (*cboperations)[code](this);
+    }
+    this->mTotal += m;
+    this->tTotal += t;
+    this->M->SetByte(0, m);
+    this->T->SetByte(0, t);
+=======
+    this->mTotal += this->M->GetByte(0);
+    this->tTotal += this->T->GetByte(0);
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
+    // Increment program counter and prevent it from going over limit?
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
 }
 
 void Processor::InitOpcodes()
@@ -46,7 +61,12 @@ void Processor::InitOpcodes()
         p->NOP();
     };
     (*operations)[0x01] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->B, p->C, p->Get16BitImmediate());
+=======
+        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
+        p->Load(p->B, p->C, p->memory->GetByte(p->PC->GetWord(0)));
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
     };
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
@@ -61,14 +81,23 @@ void Processor::InitOpcodes()
         p->DEC(p->B);
     };
     (*operations)[0x06] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->B, p->Get8BitImmediate());
+=======
+        p->Load(p->B, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
     };
     (*operations)[0x07] = [](Processor* p) {
         p->RLC(p->A);
     };
     (*operations)[0x08] = [](Processor* p) {
         uint16_t word = p->PC->GetWord(0);
+<<<<<<< HEAD
         p->Store(p->SP, word);
+=======
+        p->Store(p->SP, p->memory->GetWord(word));
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
         p->PC->SetWord(0, word + 2);
     };
     (*operations)[0x09] = [](Processor* p) {
@@ -87,7 +116,12 @@ void Processor::InitOpcodes()
         p->DEC(p->C);
     };
     (*operations)[0x0E] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->C, p->Get8BitImmediate());
+=======
+        p->Load(p->C, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
     };
     (*operations)[0x0F] = [](Processor* p) {
         p->RRC(p->A);
@@ -96,6 +130,7 @@ void Processor::InitOpcodes()
         p->STOP();
     };
     (*operations)[0x11] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->D, p->E, p->Get16BitImmediate());
     };
     (*operations)[0x12] = [](Processor* p) {
@@ -245,6 +280,39 @@ void Processor::InitOpcodes()
 
     };
     (*operations)[0x3F] = [](Processor* p) {
+=======
+        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
+        p->Load(p->D, p->E, immediate);
+    };
+    (*operations)[0x12] = [](Processor* p) {
+
+    };
+    (*operations)[0x13] = [](Processor* p) {
+
+    };
+    (*operations)[0x14] = [](Processor* p) {
+
+    };
+    (*operations)[0x15] = [](Processor* p) {
+
+    };
+    (*operations)[0x16] = [](Processor* p) {
+
+    };
+    (*operations)[0x17] = [](Processor* p) {
+
+    };
+    (*operations)[0x18] = [](Processor* p) {
+
+    };
+    (*operations)[0x19] = [](Processor* p) {
+
+    };
+    (*operations)[0x20] = [](Processor* p) {
+
+    };
+    (*operations)[0x21] = [](Processor* p) {
+>>>>>>> Started work on opcodes and added some quality of life functions to Registers
 
     };
     (*operations)[0x80] = [](Processor* p) {
