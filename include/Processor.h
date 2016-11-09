@@ -31,11 +31,11 @@ public:
     bool cbInstruction = false;
 
     uint16_t _halt, _stop, _ime;
+    Memory* memory;
 private:
     std::unordered_map<uint8_t, std::function<void(Processor* p)>>* operations;
     std::unordered_map<uint8_t, std::function<void(Processor* p)>>* cboperations;
 
-    Memory* memory;
     GPU* gpu;
 public:
     Processor(GPU* gpu, Memory* memory);
@@ -44,18 +44,7 @@ public:
     inline bool IsRunning() { return true; };
 
     void InitOpcodes();
-    inline uint8_t FetchInstruction()
-    {
-        uint16_t pc = (((uint16_t)PC->GetByte(1)) << 8) & PC->GetByte(0);
-        this->PC->SetByte(1, (pc+1) << 8);
-        this->PC->SetByte(0, pc+1);
-        pc--;
-        if (pc == 0x1000)
-        {
-            memory->SetBIOS(false);
-        }
-        return memory->GetByte(pc);
-    };
+    uint8_t FetchInstruction();
 
     void ProcessOpcode(uint8_t code);
 
@@ -323,13 +312,6 @@ public:
     void DI();
 
     void EI();
-
-
-
-
-
-
-
 
     //Compare(Register* A, Register* B);
     //Push(Register* SP);
