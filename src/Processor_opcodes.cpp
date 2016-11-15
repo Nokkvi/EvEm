@@ -17,7 +17,6 @@ void Processor::ProcessOpcode(uint8_t code)
 =======
 >>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     (*operations)[code](this);
-<<<<<<< HEAD
     if (this->cbInstruction)
     {
         this->cbInstruction = false;
@@ -45,14 +44,8 @@ uint16_t Processor::Get16BitImmediate()
 =======
         (*cboperations)[code](this);
     }
-    this->mTotal += m;
-    this->tTotal += t;
-    this->M->SetByte(0, m);
-    this->T->SetByte(0, t);
-=======
     this->mTotal += this->M->GetByte(0);
     this->tTotal += this->T->GetByte(0);
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
     // Increment program counter and prevent it from going over limit?
 >>>>>>> Started work on opcodes and added some quality of life functions to Registers
 }
@@ -352,6 +345,54 @@ void Processor::InitOpcodes()
     (*operations)[0x80] = [](Processor* p) {
         p->ADD(p->A, p->B);
     };
+	(*operations)[0xF0] = [](Processor* p) {
+		//LDH A,(n)
+	};
+	(*operations)[0xF1] = [](Processor* p) {
+		//POP AF
+	};
+	(*operations)[0xF2] = [](Processor* p) {
+		//RST XX
+	};
+	(*operations)[0xF3] = [](Processor* p) {
+		//RST DI
+	};
+	(*operations)[0xF4] = [](Processor* p) {
+		//RST XX
+	};
+	(*operations)[0xF5] = [](Processor* p) {
+		//RST PUSH AF
+	};
+	(*operations)[0xF6] = [](Processor* p) {
+		//RST OR n
+	};
+	(*operations)[0xF7] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xF8] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xF9] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFA] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFB] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFC] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFD] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFE] = [](Processor* p) {
+		//RST 38
+	};
+	(*operations)[0xFF] = [](Processor* p) {
+		//RST 38
+	};
 
     cboperations = new std::unordered_map<uint8_t, std::function<void(Processor* p)>>();
     (*cboperations)[0x00] = [](Processor* p) {
