@@ -16,7 +16,7 @@ int Register::GetSize()
     return size;
 }
 
-void Register::Increment()
+bool Register::Increment()
 {
     for (int i = 0; i < size; i++)
     {
@@ -25,9 +25,11 @@ void Register::Increment()
         else
         {
             storage[i]++;
-            break;
+            return false;
         }
     }
+
+    return true;
 }
 void Register::SetHex(int index, uint8_t hex)
 {

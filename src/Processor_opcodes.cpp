@@ -31,8 +31,8 @@ void Processor::InitOpcodes()
         p->NOP();
     };
     (*operations)[0x01] = [](Processor* p) {
-        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
         p->Load(p->B, p->C, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment
     };
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
@@ -84,35 +84,63 @@ void Processor::InitOpcodes()
         p->STOP();
     };
     (*operations)[0x11] = [](Processor* p) {
-        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
-        p->Load(p->D, p->E, immediate);
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->D, p->E, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
     };
     (*operations)[0x12] = [](Processor* p) {
-
+        uint16_t value = ((uint16_t)p->E->GetByte(0) << 8) | ((uint16_t)p->D->GetByte(0));
+        p->Store(p->A, value);
     };
     (*operations)[0x13] = [](Processor* p) {
-
+        p->INC(p->D, p->E);
     };
     (*operations)[0x14] = [](Processor* p) {
-
+        p->INC(p->D);
     };
     (*operations)[0x15] = [](Processor* p) {
-
+        p->DEC(p->D);
     };
     (*operations)[0x16] = [](Processor* p) {
-
+        p->Load(p->D, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
     };
     (*operations)[0x17] = [](Processor* p) {
-
+        p->RL(p->A);
     };
     (*operations)[0x18] = [](Processor* p) {
-
+        p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
+        p->PC->Increment();
     };
     (*operations)[0x19] = [](Processor* p) {
-
+        p->Add(p->H, p->L, p->D, p->E);
+    };
+    (*operations)[0x1A] = [](Processor* p) {
+        p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0));
+        p->Load(p->A, );
+    };
+    (*operations)[0x1B] = [](Processor* p) {
+        p->DEC(p->D, p->E);
+    };
+    (*operations)[0x1C] = [](Processor* p) {
+        p->INC(p->E);
+    };
+    (*operations)[0x1D] = [](Processor* p) {
+        p->DEC(p->E);
+    };
+    (*operations)[0x1E] = [](Processor* p) {
+        p->Load(p->E, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
+    };
+    (*operations)[0x1F] = [](Processor* p) {
+        p->RR(p->A);
     };
     (*operations)[0x20] = [](Processor* p) {
-
+        // Check flag for result 0.
+        if (true)
+            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+        else
+            p->PC->Increment();
     };
     (*operations)[0x21] = [](Processor* p) {
 

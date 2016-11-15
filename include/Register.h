@@ -11,7 +11,7 @@ class Register
     public:
         Register(int sizeInBytes);
         virtual ~Register();
-        void Increment();
+        bool Increment();
         void SetHex(int index, uint8_t hex);
         void SetByte(int index, uint8_t byte);
         void SetWord(int index, uint16_t word);
