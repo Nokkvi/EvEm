@@ -31,8 +31,9 @@ void Processor::InitOpcodes()
         p->NOP();
     };
     (*operations)[0x01] = [](Processor* p) {
-        p->Load(p->B, p->C, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->B, p->C, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
     };
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
@@ -55,7 +56,7 @@ void Processor::InitOpcodes()
     };
     (*operations)[0x08] = [](Processor* p) {
         uint16_t word = p->PC->GetWord(0);
-        p->Store(p->SP, p->memory->GetWord(word));
+        p->Store(p->SP, word);
         p->PC->SetWord(0, word + 2);
     };
     (*operations)[0x09] = [](Processor* p) {
@@ -112,11 +113,10 @@ void Processor::InitOpcodes()
         p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
     };
     (*operations)[0x19] = [](Processor* p) {
-        p->Add(p->H, p->L, p->D, p->E);
+        p->ADD(p->H, p->L, p->D, p->E);
     };
     (*operations)[0x1A] = [](Processor* p) {
-        p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0));
-        p->Load(p->A, );
+        p->Load(p->A, p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0)));
     };
     (*operations)[0x1B] = [](Processor* p) {
         p->DEC(p->D, p->E);
@@ -147,7 +147,7 @@ void Processor::InitOpcodes()
         p->PC->SetWord(0, value + 2);
     };
     (*operations)[0x22] = [](Processor* p) {
-        p->Load_Increment(p->A, p->H, p->L);
+        p->Store_Increment(p->A, p->H, p->L);
     };
     (*operations)[0x23] = [](Processor* p) {
         p->INC(p->H, p->L);
@@ -172,24 +172,78 @@ void Processor::InitOpcodes()
             p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
     };
     (*operations)[0x29] = [](Processor* p) {
-
+        p->ADD(p->H, p->L, p->H, p->L);
     };
     (*operations)[0x2A] = [](Processor* p) {
-
+        p->Load_Increment(p->A, p->H, p->L);
     };
     (*operations)[0x2B] = [](Processor* p) {
-
+        p->DEC(p->H, p->L);
     };
     (*operations)[0x2C] = [](Processor* p) {
-
+        p->INC(p->L);
     };
     (*operations)[0x2D] = [](Processor* p) {
-
+        p->DEC(p->L);
     };
     (*operations)[0x2E] = [](Processor* p) {
-
+        p->Load(p->L, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
     };
     (*operations)[0x2F] = [](Processor* p) {
+        // TODO: Make this genric maybe?
+        p->CPL();
+    };
+    (*operations)[0x30] = [](Processor* p) {
+        // TODO: Only do if no carry last result
+        if (true)
+            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+    };
+    (*operations)[0x31] = [](Processor* p) {
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->SP, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
+    };
+    (*operations)[0x32] = [](Processor* p) {
+
+    };
+    (*operations)[0x33] = [](Processor* p) {
+
+    };
+    (*operations)[0x34] = [](Processor* p) {
+
+    };
+    (*operations)[0x35] = [](Processor* p) {
+
+    };
+    (*operations)[0x36] = [](Processor* p) {
+
+    };
+    (*operations)[0x37] = [](Processor* p) {
+
+    };
+    (*operations)[0x38] = [](Processor* p) {
+
+    };
+    (*operations)[0x39] = [](Processor* p) {
+
+    };
+    (*operations)[0x3A] = [](Processor* p) {
+
+    };
+    (*operations)[0x3B] = [](Processor* p) {
+
+    };
+    (*operations)[0x3C] = [](Processor* p) {
+
+    };
+    (*operations)[0x3D] = [](Processor* p) {
+
+    };
+    (*operations)[0x3E] = [](Processor* p) {
+
+    };
+    (*operations)[0x3F] = [](Processor* p) {
 
     };
     (*operations)[0x80] = [](Processor* p) {

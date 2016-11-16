@@ -21,10 +21,26 @@ bool Register::Increment()
     for (int i = 0; i < size; i++)
     {
         if (storage[i] == 0xFF)
-            storage[i] = 0;
+            storage[i] = 0x00;
         else
         {
             storage[i]++;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Register::Decrement()
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (storage[i] == 0x00)
+            storage[i] = 0xFF;
+        else
+        {
+            storage[i]--;
             return false;
         }
     }
@@ -72,8 +88,7 @@ bool Register::GetBit(int index)
 {
     int realIndex = index / 8;
     int shift = index % 8;
-    uint8_t value = ;
-    return storage[index] & (0x01 << shift) != 0;
+    return (storage[realIndex] & (0x01 << shift)) != 0;
 }
 
 uint8_t Register::GetHex(int index)

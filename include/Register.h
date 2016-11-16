@@ -12,6 +12,7 @@ class Register
         Register(int sizeInBytes);
         virtual ~Register();
         bool Increment();
+        bool Decrement();
         void SetBit(int index, bool bit);
         void SetHex(int index, uint8_t hex);
         void SetByte(int index, uint8_t byte);

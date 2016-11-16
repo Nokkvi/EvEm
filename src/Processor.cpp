@@ -67,143 +67,110 @@ void Processor::Render()
     gpu->Step(this->T->GetByte(0));
 }
 
-// Loading into register r the contents of memory address (0xFFn).
+// Loading into register r the immediate n.
 void Processor::Load(Register* r, uint8_t n) {
-    r->SetByte(0, this->memory->GetByte(0xFF00 | n));
+    r->SetByte(0, n);
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
 }
 
-/*Loads into register r the contents of the internal RAM or register specified
-by the 16-bit immediate operand nn.%*/
+// Loads into register r the 16 bit immediate nn
 void Processor::Load(Register* r, uint16_t nn) {
-    r->SetByte(0, this->memory->GetByte(nn));
+    r->SetWord(0, nn);
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-/* Loads into register r the contents of internal RAM, port register, or mode
-register at the address in the range 0xFF00-0xFFFF specified by register X.
-Loads r <-- ($FF00+X).%*/
+// Loads into 8 bit register r the contents of 8 bit register X.
 void Processor::Load(Register* r, Register* X) {
-    r->SetByte(0, this->memory->GetByte(0xFF00 | X->GetByte(0)));
-    this->M->SetByte(0, 0x02);
-    this->T->SetByte(0, 0x08);
-}
-
-/*Loads into register r the contents of memory specified by the contents of
-register pair xy %*/
-void Processor::Load(Register* r, Register* X, Register* Y){
-    uint16_t temp = X->GetByte(0) >> 8;
-    temp |= Y->GetByte(0);
-    r->SetByte(0, this->memory->GetByte(temp));
-    this->M->SetByte(0, 0x02);
-    this->T->SetByte(0, 0x08);
-}
-
-/*Loads into register r the contents of memory specified by the contents of
-register pair xy, simultaneously incrememnt the contents of XY.%*/
-void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
-    uint16_t temp = X->GetByte(0) >> 8;
-    temp |= Y->GetByte(0);
-    r->SetByte(0, this->memory->GetByte(temp));
-    temp++;
-    X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
-    Y->SetByte(0, (uint8_t)(temp & 0x00FF));
-    this->M->SetByte(0, 0x02);
-    this->T->SetByte(0, 0x08);
-}
-
-/*Loads into register r the contents of memory specified by the contents of
-register pair XY, then decrementing the pair XY.%*/
-void Processor::Load_Decrement(Register* r, Register* X, Register* Y) {
-    uint16_t temp = X->GetByte(0) >> 8;
-    temp |= Y->GetByte(0);
-    r->SetByte(0, this->memory->GetByte(temp));
-    temp--;
-    X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
-    Y->SetByte(0, (uint8_t)(temp & 0x00FF));
-    this->M->SetByte(0, 0x02);
-    this->T->SetByte(0, 0x08);
-}
-
-/*From Register*/
-
-// Loads into register r the contents of register X.%
-void Processor::Load_Register(Register* r, Register* X) {
     r->SetByte(0, X->GetByte(0));
-    this->M->SetByte(0, 0x01);
-    this->T->SetByte(0, 0x04);
-}
-
-/*Immediate Value*/
-
-// Loads into register r the immediate value of n.%
-void Processor::Load_Immediate(Register* r, uint8_t n) {
-    r->SetByte(0, n);
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-/*To Memory*/
-
-/*From Register*/
-
-/*Loading from register r into memory address (0xFF00-0xFFFF) determined by
-the value of n.%*/
-void Processor::Store(Register* r, uint8_t n) {
-    this->memory->SetByte(0xFF00 | n, r->GetByte(0));
+// Loads into register pair XY the immediate nn.
+void Processor::Load(Register* X, Register* Y, uint16_t nn) {
+    Y->SetByte(0, (uint8_t)(nn >> 8));
+    X->SetByte(0, (uint8_t)nn);
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-/*Stores the contents of register A at the internal RAM or register specified
-by the 16-bit immediate operand nn.%*/
+// Loads into 16 bit register r the values in register pair XY.
+void Processor::Load(Register* r, Register* X, Register* Y){
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
+    r->SetWord(0, temp);
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
+// Loads into 16 bit register r the values in register pair XY, simultaneously increment the contents of register pair XY.
+void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
+    r->SetWord(0, temp);
+    temp++;
+    Y->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
+    X->SetByte(0, (uint8_t)(temp & 0x00FF));
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
+// Loads into 16 bit register r the values in register pair XY, simultaneously decrement the contents of register pair XY.
+void Processor::Load_Decrement(Register* r, Register* X, Register* Y) {
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
+    r->SetWord(0, temp);
+    temp--;
+    Y->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
+    X->SetByte(0, (uint8_t)(temp & 0x00FF));
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
+// Stores the contents of 8 bit register r at address nn.
 void Processor::Store(Register* r, uint16_t nn) {
     this->memory->SetByte(nn, r->GetByte(0));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-// Loads r -- > ($FF00+X)%
+// Stores the contents of 8 bit register r at address specified by 16 bit register X.
 void Processor::Store(Register* r, Register* X){
-    this->memory->SetByte(0xFF00 | X->GetByte(0), X->GetByte(0));
+    this->memory->SetByte(X->GetWord(0), r->GetByte(0));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-// Stores the contents of register r in memory specified by register pair xy.%
+// Stores the contents of register r in memory specified by register pair XY.
 void Processor::Store(Register* r, Register* X, Register* Y) {
-    uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 
 }
 
-/*Store the contents of register r in the memory specified by register pair xy,
-simultaneously increment the contents of xy.%*/
+// Stores the contents of register r in memory specified by register pair XY, simultaneously increment the contents of XY.
 void Processor::Store_Increment(Register* r, Register* X, Register* Y){
-    uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
-    temp++;
-    X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
-    Y->SetByte(0, (uint8_t)(temp & 0x00FF));
+    if (X->Increment())
+        Y->Increment();
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
-/*Store the contents of register r in the memory specified by register pair xy,
-simultaneously decrement the contents of xy.%*/
+// Stores the contents of register r in memory specified by register pair XY, simultaneously decrement the contents of XY.
 void Processor::Store_Decrement(Register* r, Register* X, Register* Y) {
-    uint16_t temp = X->GetByte(0) << 8;
-    temp = Y->GetByte(0);
+    uint16_t temp = Y->GetByte(0) << 8;
+    temp |= X->GetByte(0);
     this->memory->SetByte(temp, r->GetByte(0));
-    temp--;
-    X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
-    Y->SetByte(0, (uint8_t)(temp & 0x00FF));
+    if (X->Decrement())
+        Y->Decrement();
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
@@ -212,21 +179,13 @@ void Processor::Store_Decrement(Register* r, Register* X, Register* Y) {
 
 // Loads 8-bit immediate data n into memory specified by register pair xy.%
 void Processor::Store(Register* X, Register* Y, uint8_t n) {
-    uint16_t temp = X->GetByte(0) << 8;
-    Y->GetByte(0);
+    uint16_t temp = Y->GetByte(0) << 8;
+    X->GetByte(0);
     this->memory->SetByte(temp, n);
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
 }
-
 /*
-/   16-bit loads
-*/
-
-/*To Register*/
-
-/*Immediate Data*/
-
 // Load two bytes of immediate data to register pair xy%.
 void Processor::Load(Register* X, Register* Y, uint16_t nn){
     X->SetByte(0, nn >> 8);
@@ -234,8 +193,6 @@ void Processor::Load(Register* X, Register* Y, uint16_t nn){
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
 }
-
-/*From Stack Pointer*/
 
 // The 8-bit operand e is added to SP and the result is stored in HL.%
 void Processor::Load(Register* SP, Register* X, Register* Y, uint8_t e) {
@@ -248,12 +205,8 @@ void Processor::Load(Register* SP, Register* X, Register* Y, uint8_t e) {
     this->T->SetByte(0, 0x12);
 }
 
-/*To Memory*/
-
-/*From Stack Pointer*/
-
-/*Stores the lower byte of SP at address nn specified by the 16-bit immediate
-operand nn and the upper byte of SP at address nn + 1.*/
+// Stores the lower byte of SP at address nn specified by the 16-bit immediate
+// operand nn and the upper byte of SP at address nn + 1.
 void Processor::Store_SP(Register* SP, uint16_t nn){
     this->memory->SetByte(nn, SP->GetByte(0));
     this->memory->SetByte(nn+1,SP->GetByte(1));
@@ -261,18 +214,14 @@ void Processor::Store_SP(Register* SP, uint16_t nn){
     this->T->SetByte(0, 0x12);
 }
 
-/*To Stack Pointer*/
-
-/*From Registers*/
-
-// Load the contents of register pair HL(not the memory location) in stack pointer SP.%
+// Load the contents of register pair HL(not the memory location) in stack pointer SP.
 void Processor::Load_HL(Register* X, Register* Y, Register* SP) {
     X->SetByte(0, (SP->GetByte(1)));
     Y->SetByte(0, (SP->GetByte(0)));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
-
+*/
 
 /*Not sure how to classify push and pop....*/
 
@@ -961,6 +910,11 @@ void Processor::SCF(){
     this->F->SetByte(0, this->F->GetByte(0)|0x10);
     this->M->SetByte(0, 0x01);
     this->M->SetByte(0, 0x04);
+}
+
+void Processor::JR(int8_t value)
+{
+
 }
 
 void Processor::NOP(){
