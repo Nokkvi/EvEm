@@ -11,8 +11,11 @@ uint8_t Processor::FetchInstruction()
     return memory->GetByte(pc);
 };
 
+<<<<<<< HEAD
 void Processor::ProcessOpcode(uint8_t code)
 {
+=======
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     (*operations)[code](this);
 <<<<<<< HEAD
     if (this->cbInstruction)
@@ -62,11 +65,17 @@ void Processor::InitOpcodes()
     };
     (*operations)[0x01] = [](Processor* p) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         p->Load(p->B, p->C, p->Get16BitImmediate());
 =======
         uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
         p->Load(p->B, p->C, p->memory->GetByte(p->PC->GetWord(0)));
 >>>>>>> Started work on opcodes and added some quality of life functions to Registers
+=======
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->B, p->C, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     };
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
@@ -94,10 +103,14 @@ void Processor::InitOpcodes()
     (*operations)[0x08] = [](Processor* p) {
         uint16_t word = p->PC->GetWord(0);
 <<<<<<< HEAD
+<<<<<<< HEAD
         p->Store(p->SP, word);
 =======
         p->Store(p->SP, p->memory->GetWord(word));
 >>>>>>> Started work on opcodes and added some quality of life functions to Registers
+=======
+        p->Store(p->SP, word);
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
         p->PC->SetWord(0, word + 2);
     };
     (*operations)[0x09] = [](Processor* p) {
@@ -159,7 +172,11 @@ void Processor::InitOpcodes()
         p->ADD(p->H, p->L, p->D, p->E);
     };
     (*operations)[0x1A] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->A, p->Get8BitImmediate());
+=======
+        p->Load(p->A, p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0)));
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     };
     (*operations)[0x1B] = [](Processor* p) {
         p->DEC(p->D, p->E);
@@ -226,7 +243,12 @@ void Processor::InitOpcodes()
         p->DEC(p->L);
     };
     (*operations)[0x2E] = [](Processor* p) {
+<<<<<<< HEAD
         p->Load(p->L, p->Get8BitImmediate());
+=======
+        p->Load(p->L, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     };
     (*operations)[0x2F] = [](Processor* p) {
         // TODO: Make this genric maybe?
@@ -235,10 +257,19 @@ void Processor::InitOpcodes()
     (*operations)[0x30] = [](Processor* p) {
         // TODO: Only do if no carry last result
         if (true)
+<<<<<<< HEAD
             p->JR((int8_t)p->Get8BitImmediate());
     };
     (*operations)[0x31] = [](Processor* p) {
         p->Load(p->SP, p->Get16BitImmediate());
+=======
+            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+    };
+    (*operations)[0x31] = [](Processor* p) {
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->SP, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     };
     (*operations)[0x32] = [](Processor* p) {
 
@@ -280,6 +311,7 @@ void Processor::InitOpcodes()
 
     };
     (*operations)[0x3F] = [](Processor* p) {
+<<<<<<< HEAD
 =======
         uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
         p->Load(p->D, p->E, immediate);
@@ -313,6 +345,8 @@ void Processor::InitOpcodes()
     };
     (*operations)[0x21] = [](Processor* p) {
 >>>>>>> Started work on opcodes and added some quality of life functions to Registers
+=======
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
 
     };
     (*operations)[0x80] = [](Processor* p) {

@@ -90,8 +90,11 @@ public:
             // Loads into 16 bit register r the values in register pair XY, simultaneously decrement the contents of register pair XY.
             void Load_Decrement(Register* r, Register* X, Register* Y);
 
+<<<<<<< HEAD
     // From Immediate
 
+=======
+>>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     /*To Memory*/
 
         /*From Register*/
