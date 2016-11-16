@@ -31,6 +31,17 @@ bool Register::Increment()
 
     return true;
 }
+
+void Register::SetBit(int index, bool bit)
+{
+    int realIndex = index / 8;
+    int shift = index % 8;
+    if (bit)
+        storage[realIndex] |= 0x01 << shift;
+    else
+        storage[realIndex] &= 0xFF - (0x01 << shift);
+}
+
 void Register::SetHex(int index, uint8_t hex)
 {
     // Get the index of the byte the hex is in.
@@ -55,6 +66,14 @@ void Register::SetWord(int index, uint16_t word)
     int realIndex = index * 2;
     storage[realIndex] = word & 0x00FF;
     storage[realIndex + 1] = word >> 8;
+}
+
+bool Register::GetBit(int index)
+{
+    int realIndex = index / 8;
+    int shift = index % 8;
+    uint8_t value = ;
+    return storage[index] & (0x01 << shift) != 0;
 }
 
 uint8_t Register::GetHex(int index)

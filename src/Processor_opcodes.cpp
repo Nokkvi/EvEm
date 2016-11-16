@@ -110,7 +110,6 @@ void Processor::InitOpcodes()
     };
     (*operations)[0x18] = [](Processor* p) {
         p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
-        p->PC->Increment();
     };
     (*operations)[0x19] = [](Processor* p) {
         p->Add(p->H, p->L, p->D, p->E);
@@ -143,6 +142,54 @@ void Processor::InitOpcodes()
             p->PC->Increment();
     };
     (*operations)[0x21] = [](Processor* p) {
+        uint16_t value = p->PC->GetWord(0);
+        p->Load(p->H, p->L, p->memory->GetWord(value));
+        p->PC->SetWord(0, value + 2);
+    };
+    (*operations)[0x22] = [](Processor* p) {
+        p->Load_Increment(p->A, p->H, p->L);
+    };
+    (*operations)[0x23] = [](Processor* p) {
+        p->INC(p->H, p->L);
+    };
+    (*operations)[0x24] = [](Processor* p) {
+        p->INC(p->H);
+    };
+    (*operations)[0x25] = [](Processor* p) {
+        p->DEC(p->H);
+    };
+    (*operations)[0x26] = [](Processor* p) {
+        p->Load(p->H, p->memory->GetByte(p->PC->GetWord(0)));
+        p->PC->Increment();
+    };
+    (*operations)[0x27] = [](Processor* p) {
+        // TODO: Make this genric maybe?
+        p->DAA();
+    };
+    (*operations)[0x28] = [](Processor* p) {
+        // TODO: Check if last result was 0
+        if (true)
+            p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
+    };
+    (*operations)[0x29] = [](Processor* p) {
+
+    };
+    (*operations)[0x2A] = [](Processor* p) {
+
+    };
+    (*operations)[0x2B] = [](Processor* p) {
+
+    };
+    (*operations)[0x2C] = [](Processor* p) {
+
+    };
+    (*operations)[0x2D] = [](Processor* p) {
+
+    };
+    (*operations)[0x2E] = [](Processor* p) {
+
+    };
+    (*operations)[0x2F] = [](Processor* p) {
 
     };
     (*operations)[0x80] = [](Processor* p) {

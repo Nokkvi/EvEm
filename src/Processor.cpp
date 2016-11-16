@@ -95,17 +95,17 @@ void Processor::Load(Register* r, Register* X) {
 register pair xy %*/
 void Processor::Load(Register* r, Register* X, Register* Y){
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
+    temp |= Y->GetByte(0);
     r->SetByte(0, this->memory->GetByte(temp));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
 
 /*Loads into register r the contents of memory specified by the contents of
-register pair xy, simultaneously incrememnt the contents of HL.%*/
+register pair xy, simultaneously incrememnt the contents of XY.%*/
 void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
+    temp |= Y->GetByte(0);
     r->SetByte(0, this->memory->GetByte(temp));
     temp++;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
@@ -118,7 +118,7 @@ void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
 register pair XY, then decrementing the pair XY.%*/
 void Processor::Load_Decrement(Register* r, Register* X, Register* Y) {
     uint16_t temp = X->GetByte(0) >> 8;
-    temp = Y->GetByte(0);
+    temp |= Y->GetByte(0);
     r->SetByte(0, this->memory->GetByte(temp));
     temp--;
     X->SetByte(0, (uint8_t)((temp & 0xFF00) >> 8));
