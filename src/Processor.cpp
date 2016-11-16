@@ -5,7 +5,7 @@ Processor::Processor(GPU* gpu, Memory* memory)
     this->gpu = gpu;
     this->memory = memory;
     //pMemory->SetProcessor(this);
-    InitOpcodes();
+//    InitOpcodes();
 
     this->A = new Register(1);
     this->B = new Register(1);
@@ -273,28 +273,33 @@ void Processor::Store_SP(Register* SP, uint16_t nn){
 
 // Load the contents of register pair HL(not the memory location) in stack pointer SP.
 void Processor::Load_HL(Register* X, Register* Y, Register* SP) {
-    X->SetByte(0, (SP->GetByte(1)));
+    //Incorrect, we should be loading from registers to stack pointer not reverse.
+	X->SetByte(0, (SP->GetByte(1)));
     Y->SetByte(0, (SP->GetByte(0)));
     this->M->SetByte(0, 0x02);
     this->T->SetByte(0, 0x08);
 }
+<<<<<<< HEAD
 */
 
 /*Not sure how to classify push and pop....*/
 
 /*Pushes the contents of register pair qq onto the memory stack. First 1 is
 subtracted from SP and the contents of the higherportion of qq are placed on
+=======
+
+/*Pushes the contents of register pair xy onto the memory stack. First 1 is
+subtracted from SP and the contents of the higherportion of xy are placed on
+>>>>>>> fixes to stuff
 the stack. The contents of the lower portion of qq are then placed on the
 stack. The contents of SP are automatically decremented by 2.*/
 void Processor::Push(Register* SP, Register* X, Register* Y){
-    uint16_t temp = SP->GetByte(1) << 8;
-    temp = SP->GetByte(0);
+    uint16_t temp = SP->GetWord(0);
     temp--;
     this->memory->SetByte(temp, X->GetByte(0));
     temp--;
     this->memory->SetByte(temp, Y->GetByte(0));
-    SP->SetByte(1, (uint8_t)temp >> 8);
-    SP->SetByte(0, (uint8_t)temp && 0x00FF);
+	SP->SetWord(0, temp);
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
 }
@@ -305,18 +310,15 @@ lower portion of qq. Next, the contents of SP are incremented by 1 and the
 contents of the memory they specify are loaded in the upper portion of qq.
 The contents of SP are automatically incremented by 2.*/
 void Processor::Pop(Register* SP, Register* X, Register* Y) {
-    uint16_t temp = SP->GetByte(1) << 8;
-    temp = SP->GetByte(0);
-    X->SetByte(0, this->memory->GetByte(SP->GetByte(0)));
-    temp++;
-    Y->SetByte(0, this->memory->GetByte(SP->GetByte(0)));
-    temp++;
-    SP->SetByte(1, (uint8_t)temp >> 8);
-    SP->SetByte(0, (uint8_t)temp && 0x00FF);
+	uint16_t temp = SP->GetWord(0);
+	Y->SetByte(0,this->memory->GetByte(temp));
+	temp++;
+	X->SetByte(0, this->memory->GetByte(temp));
+	temp++;
+	SP->SetWord(0, temp);
     this->M->SetByte(0, 0x03);
     this->T->SetByte(0, 0x12);
 }
-
 
 void Processor::ADD(Register* X, Register* Y){
     uint16_t sum = (uint16_t)X->GetByte(0) + (uint16_t)Y->GetByte(0);
@@ -381,7 +383,7 @@ void Processor::ADDSIGNED(Register* SP, int8_t n){
     temp += n;
     if(temp > 255)
         this->F->SetHex(1, 0x1);
-    SP->SetByte(1, (uint8_t)temp >> 8);
+    SP->SetByte(1, (uint8_t)temp << 8);
     SP->SetByte(0, (uint8_t)temp && 0x00FF);
     this->M->SetByte(0, 0x04);
     this->T->SetByte(0, 0x16);
