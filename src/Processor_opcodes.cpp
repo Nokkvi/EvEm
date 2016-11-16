@@ -49,7 +49,6 @@ void Processor::InitOpcodes()
     };
     (*operations)[0x06] = [](Processor* p) {
         p->Load(p->B, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
     };
     (*operations)[0x07] = [](Processor* p) {
         p->RLC(p->A);

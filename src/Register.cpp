@@ -79,9 +79,8 @@ void Register::SetByte(int index, uint8_t byte)
 
 void Register::SetWord(int index, uint16_t word)
 {
-    int realIndex = index * 2;
-    storage[realIndex] = word & 0x00FF;
-    storage[realIndex + 1] = word >> 8;
+    storage[index] = word & 0x00FF;
+    storage[index + 1] = word >> 8;
 }
 
 bool Register::GetBit(int index)
@@ -108,6 +107,5 @@ uint8_t Register::GetByte(int index)
 
 uint16_t Register::GetWord(int index)
 {
-    int realIndex = index * 2;
-    return ((uint16_t)storage[realIndex + 1] << 8) | storage[realIndex];
+    return ((uint16_t)storage[index + 1] << 8) | storage[index];
 }

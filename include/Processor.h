@@ -88,6 +88,8 @@ public:
             // Loads into 16 bit register r the values in register pair XY, simultaneously decrement the contents of register pair XY.
             void Load_Decrement(Register* r, Register* X, Register* Y);
 
+    // From Immediate
+
     /*To Memory*/
 
         /*From Register*/

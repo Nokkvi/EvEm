@@ -173,8 +173,6 @@ void Processor::Store_Decrement(Register* r, Register* X, Register* Y) {
     this->T->SetByte(0, 0x08);
 }
 
-/*Immediate Value*/
-
 // Loads 8-bit immediate data n into memory specified by register pair xy.%
 void Processor::Store(Register* X, Register* Y, uint8_t n) {
     uint16_t temp = X->GetByte(0) << 8;
