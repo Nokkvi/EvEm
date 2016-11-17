@@ -4,6 +4,7 @@
 #include "Definitions.h"
 #include "Register.h"
 #include "Screen.h"
+#include "objdata.h"
 
 class GPU
 {
@@ -16,6 +17,9 @@ class GPU
         Register *pal, *scx, *scy;
         unsigned int clock;
         bool switchBG, bgMap, bgTile, switchLCD;
+
+        uint8_t* oam;
+        objdata* objectdata;
     public:
         GPU();
         virtual ~GPU();
@@ -26,6 +30,7 @@ class GPU
         void Reset();
         void Step(unsigned int clock);
         void Render();
+        void buildobjdata(uint16_t address, uint8_t val);
     private:
         void Scanline();
 };
