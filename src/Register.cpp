@@ -108,3 +108,4 @@ uint16_t Register::GetWord(int index)
 {
     return ((uint16_t)storage[index + 1] << 8) | storage[index];
 }
+

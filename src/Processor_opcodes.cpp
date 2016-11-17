@@ -342,10 +342,563 @@ void Processor::InitOpcodes()
 >>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
 
     };
+
+	
+
+
     (*operations)[0x80] = [](Processor* p) {
         p->ADD(p->A, p->B);
     };
 	*/
+//--------------------------------------------------------------
+	
+	(*operations)[0x40] = [](Processor* p) {
+		p->Load(p->B, p->B);
+	};
+
+	(*operations)[0x41] = [](Processor* p) {
+		p->Load(p->B, p->C);
+	};
+
+	(*operations)[0x42] = [](Processor* p) {
+		p->Load(p->B, p->D);
+	};
+
+	(*operations)[0x43] = [](Processor* p) {
+		p->Load(p->B, p->E);
+	};
+
+	(*operations)[0x44] = [](Processor* p) {
+		p->Load(p->B, p->H);
+	};
+
+	(*operations)[0x45] = [](Processor* p) {
+		p->Load(p->B, p->L);
+	};
+
+	(*operations)[0x46] = [](Processor* p) {
+		p->Load(p->B, p->H, p->L);
+	};
+
+	(*operations)[0x47] = [](Processor* p) {
+		p->Load(p->B, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x48] = [](Processor* p) {
+		p->Load(p->C, p->B);
+	};
+
+	(*operations)[0x49] = [](Processor* p) {
+		p->Load(p->C, p->C);
+	};
+
+	(*operations)[0x4A] = [](Processor* p) {
+		p->Load(p->C, p->D);
+	};
+
+	(*operations)[0x4B] = [](Processor* p) {
+		p->Load(p->C, p->E);
+	};
+
+	(*operations)[0x4C] = [](Processor* p) {
+		p->Load(p->C, p->H);
+	};
+
+	(*operations)[0x4D] = [](Processor* p) {
+		p->Load(p->C, p->L);
+	};
+
+	(*operations)[0x4E] = [](Processor* p) {
+		p->Load(p->C, p->H, p->L);
+	};
+
+	(*operations)[0x4F] = [](Processor* p) {
+		p->Load(p->C, p->A);
+	};
+
+//----------------------------------------------------------
+
+	(*operations)[0x50] = [](Processor* p) {
+		p->Load(p->D, p->B);
+	};
+
+	(*operations)[0x51] = [](Processor* p) {
+		p->Load(p->D, p->C);
+	};
+
+	(*operations)[0x52] = [](Processor* p) {
+		p->Load(p->D, p->D);
+	};
+
+	(*operations)[0x53] = [](Processor* p) {
+		p->Load(p->D, p->E);
+	};
+
+	(*operations)[0x54] = [](Processor* p) {
+		p->Load(p->D, p->H);
+	};
+
+	(*operations)[0x55] = [](Processor* p) {
+		p->Load(p->D, p->L);
+	};
+
+	(*operations)[0x56] = [](Processor* p) {
+		p->Load(p->D, p->H, p->L);
+	};
+
+	(*operations)[0x57] = [](Processor* p) {
+		p->Load(p->D, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x58] = [](Processor* p) {
+		p->Load(p->E, p->B);
+	};
+
+	(*operations)[0x59] = [](Processor* p) {
+		p->Load(p->E, p->C);
+	};
+
+	(*operations)[0x5A] = [](Processor* p) {
+		p->Load(p->E, p->D);
+	};
+
+	(*operations)[0x5B] = [](Processor* p) {
+		p->Load(p->E, p->E);
+	};
+
+	(*operations)[0x5C] = [](Processor* p) {
+		p->Load(p->E, p->H);
+	};
+
+	(*operations)[0x5D] = [](Processor* p) {
+		p->Load(p->E, p->L);
+	};
+
+	(*operations)[0x5E] = [](Processor* p) {
+		p->Load(p->E, p->H, p->L);
+	};
+
+	(*operations)[0x5F] = [](Processor* p) {
+		p->Load(p->E, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x60] = [](Processor* p) {
+		p->Load(p->H, p->B);
+	};
+
+	(*operations)[0x61] = [](Processor* p) {
+		p->Load(p->H, p->C);
+	};
+
+	(*operations)[0x62] = [](Processor* p) {
+		p->Load(p->H, p->D);
+	};
+
+	(*operations)[0x63] = [](Processor* p) {
+		p->Load(p->H, p->E);
+	};
+
+	(*operations)[0x64] = [](Processor* p) {
+		p->Load(p->H, p->H);
+	};
+
+	(*operations)[0x65] = [](Processor* p) {
+		p->Load(p->H, p->L);
+	};
+
+	(*operations)[0x66] = [](Processor* p) {
+		p->Load(p->H, p->H, p->L);
+	};
+
+	(*operations)[0x67] = [](Processor* p) {
+		p->Load(p->H, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x68] = [](Processor* p) {
+		p->Load(p->L, p->B);
+	};
+
+	(*operations)[0x69] = [](Processor* p) {
+		p->Load(p->L, p->C);
+	};
+
+	(*operations)[0x6A] = [](Processor* p) {
+		p->Load(p->L, p->D);
+	};
+
+	(*operations)[0x6B] = [](Processor* p) {
+		p->Load(p->L, p->E);
+	};
+
+	(*operations)[0x6C] = [](Processor* p) {
+		p->Load(p->L, p->H);
+	};
+
+	(*operations)[0x6D] = [](Processor* p) {
+		p->Load(p->L, p->L);
+	};
+
+	(*operations)[0x6E] = [](Processor* p) {
+		p->Load(p->L, p->H, p->L);
+	};
+
+	(*operations)[0x6F] = [](Processor* p) {
+		p->Load(p->L, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x70] = [](Processor* p) {
+		p->Store(p->B, p->H, p->L);
+	};
+
+	(*operations)[0x71] = [](Processor* p) {
+		p->Store(p->C, p->H, p->L);
+	};
+
+	(*operations)[0x72] = [](Processor* p) {
+		p->Store(p->D, p->H, p->L);
+	};
+
+	(*operations)[0x73] = [](Processor* p) {
+		p->Store(p->E, p->H, p->L);
+	};
+
+	(*operations)[0x74] = [](Processor* p) {
+		p->Store(p->H, p->H, p->L);
+	};
+
+	(*operations)[0x75] = [](Processor* p) {
+		p->Store(p->L, p->H, p->L);
+	};
+
+	(*operations)[0x76] = [](Processor* p) {
+		//HALT
+	};
+
+	(*operations)[0x77] = [](Processor* p) {
+		p->Store(p->A, p->H, p->L);
+	};
+//-----------------------------------------------------------
+	
+	(*operations)[0x78] = [](Processor* p) {
+		p->Load(p->A, p->B);
+	};
+
+	(*operations)[0x79] = [](Processor* p) {
+		p->Load(p->A, p->C);
+	};
+
+	(*operations)[0x7A] = [](Processor* p) {
+		p->Load(p->A, p->D);
+	};
+
+	(*operations)[0x7B] = [](Processor* p) {
+		p->Load(p->A, p->E);
+	};
+
+	(*operations)[0x7C] = [](Processor* p) {
+		p->Load(p->A, p->H);
+	};
+
+	(*operations)[0x7D] = [](Processor* p) {
+		p->Load(p->A, p->L);
+	};
+
+	(*operations)[0x7E] = [](Processor* p) {
+		p->Load(p->A, p->H, p->L);
+	};
+
+	(*operations)[0x7F] = [](Processor* p) {
+		p->Load(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x80] = [](Processor* p) {
+		p->ADD(p->A, p->B);
+	};
+
+	(*operations)[0x81] = [](Processor* p) {
+		p->ADD(p->A, p->C);
+	};
+
+	(*operations)[0x82] = [](Processor* p) {
+		p->ADD(p->A, p->D);
+	};
+
+	(*operations)[0x83] = [](Processor* p) {
+		p->ADD(p->A, p->E);
+	};
+
+	(*operations)[0x84] = [](Processor* p) {
+		p->ADD(p->A, p->H);
+	};
+
+	(*operations)[0x85] = [](Processor* p) {
+		p->ADD(p->A, p->L);
+	};
+
+	(*operations)[0x86] = [](Processor* p) {
+		p->ADD(p->A, p->H, p->L);
+	};
+
+	(*operations)[0x87] = [](Processor* p) {
+		p->ADD(p->A, p->A);
+	};
+
+//---------------------------------------------------------------------
+
+	(*operations)[0x88] = [](Processor* p) {
+		p->ADC(p->A, p->B);
+	};
+
+	(*operations)[0x89] = [](Processor* p) {
+		p->ADC(p->A, p->C);
+	};
+
+	(*operations)[0x8A] = [](Processor* p) {
+		p->ADC(p->A, p->D);
+	};
+
+	(*operations)[0x8B] = [](Processor* p) {
+		p->ADC(p->A, p->E);
+	};
+
+	(*operations)[0x8C] = [](Processor* p) {
+		p->ADC(p->A, p->H);
+	};
+
+	(*operations)[0x8D] = [](Processor* p) {
+		p->ADC(p->A, p->L);
+	};
+
+	(*operations)[0x8E] = [](Processor* p) {
+		p->ADC(p->A, p->H, p->L);
+	};
+
+	(*operations)[0x8F] = [](Processor* p) {
+		p->ADC(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0x90] = [](Processor* p) {
+		p->SUB(p->A, p->B);
+	};
+
+	(*operations)[0x91] = [](Processor* p) {
+		p->SUB(p->A, p->C);
+	};
+
+	(*operations)[0x92] = [](Processor* p) {
+		p->SUB(p->A, p->D);
+	};
+
+	(*operations)[0x93] = [](Processor* p) {
+		p->SUB(p->A, p->E);
+	};
+
+	(*operations)[0x94] = [](Processor* p) {
+		p->SUB(p->A, p->H);
+	};
+
+	(*operations)[0x95] = [](Processor* p) {
+		p->SUB(p->A, p->L);
+	};
+
+	(*operations)[0x96] = [](Processor* p) {
+		p->SUB(p->A, p->H, p->L);
+	};
+
+	(*operations)[0x97] = [](Processor* p) {
+		p->SUB(p->A, p->A);
+	};
+
+//-------------------------------------------------------------
+
+	(*operations)[0x98] = [](Processor* p) {
+		p->SBC(p->A, p->B);
+	};
+
+	(*operations)[0x99] = [](Processor* p) {
+		p->SBC(p->A, p->C);
+	};
+
+	(*operations)[0x9A] = [](Processor* p) {
+		p->SBC(p->A, p->D);
+	};
+
+	(*operations)[0x9B] = [](Processor* p) {
+		p->SBC(p->A, p->E);
+	};
+
+	(*operations)[0x9C] = [](Processor* p) {
+		p->SBC(p->A, p->H);
+	};
+
+	(*operations)[0x9D] = [](Processor* p) {
+		p->SBC(p->A, p->L);
+	};
+
+	(*operations)[0x9E] = [](Processor* p) {
+		p->SBC(p->A, p->H, p->L);
+	};
+
+	(*operations)[0x9F] = [](Processor* p) {
+		p->SBC(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0xA0] = [](Processor* p) {
+		p->AND(p->A, p->B);
+	};
+
+	(*operations)[0xA1] = [](Processor* p) {
+		p->AND(p->A, p->C);
+	};
+
+	(*operations)[0xA2] = [](Processor* p) {
+		p->AND(p->A, p->C);
+	};
+
+	(*operations)[0xA3] = [](Processor* p) {
+		p->AND(p->A, p->D);
+	};
+
+	(*operations)[0xA4] = [](Processor* p) {
+		p->AND(p->A, p->E);
+	};
+
+	(*operations)[0xA5] = [](Processor* p) {
+		p->AND(p->A, p->H);
+	};
+
+	(*operations)[0xA6] = [](Processor* p) {
+		p->AND(p->A, p->L);
+	};
+
+	(*operations)[0xA7] = [](Processor* p) {
+		p->AND(p->A, p->H, p->L);
+	};
+
+	(*operations)[0xA8] = [](Processor* p) {
+		p->AND(p->A, p->A);
+	};
+
+//-----------------------------------------------------------------
+
+	(*operations)[0xA8] = [](Processor* p) {
+		p->XOR(p->A, p->B);
+	};
+
+	(*operations)[0xA9] = [](Processor* p) {
+		p->XOR(p->A, p->C);
+	};
+
+	(*operations)[0xAA] = [](Processor* p) {
+		p->XOR(p->A, p->D);
+	};
+
+	(*operations)[0xAB] = [](Processor* p) {
+		p->XOR(p->A, p->E);
+	};
+
+	(*operations)[0xAC] = [](Processor* p) {
+		p->XOR(p->A, p->H);
+	};
+
+	(*operations)[0xAD] = [](Processor* p) {
+		p->XOR(p->A, p->L);
+	};
+
+	(*operations)[0xAE] = [](Processor* p) {
+		p->XOR(p->A, p->H, p->L);
+	};
+
+	(*operations)[0xAF] = [](Processor* p) {
+		p->XOR(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0xB0] = [](Processor* p) {
+		p->OR(p->A, p->B);
+	};
+
+	(*operations)[0xB1] = [](Processor* p) {
+		p->OR(p->A, p->C);
+	};
+
+	(*operations)[0xB2] = [](Processor* p) {
+		p->OR(p->A, p->D);
+	};
+
+	(*operations)[0xB3] = [](Processor* p) {
+		p->OR(p->A, p->E);
+	};
+
+	(*operations)[0xB4] = [](Processor* p) {
+		p->OR(p->A, p->H);
+	};
+
+	(*operations)[0xB5] = [](Processor* p) {
+		p->OR(p->A, p->L);
+	};
+
+	(*operations)[0xB6] = [](Processor* p) {
+		p->OR(p->A, p->H, p->L);
+	};
+
+	(*operations)[0xB7] = [](Processor* p) {
+		p->OR(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0xB8] = [](Processor* p) {
+		p->CP(p->A, p->B);
+	};
+
+	(*operations)[0xB9] = [](Processor* p) {
+		p->CP(p->A, p->C);
+	};
+
+	(*operations)[0xBA] = [](Processor* p) {
+		p->CP(p->A, p->D);
+	};
+
+	(*operations)[0xBB] = [](Processor* p) {
+		p->CP(p->A, p->E);
+	};
+
+	(*operations)[0xBC] = [](Processor* p) {
+		p->CP(p->A, p->H);
+	};
+
+	(*operations)[0xBD] = [](Processor* p) {
+		p->CP(p->A, p->L);
+	};
+
+	(*operations)[0xBE] = [](Processor* p) {
+		p->CP(p->A, p->H, p->L);
+	};
+
+	(*operations)[0xBF] = [](Processor* p) {
+		p->CP(p->A, p->A);
+	};
+
+//-----------------------------------------------------------
+
 	(*operations)[0xF0] = [](Processor* p) {
 		//LDH A,(n)
 	};
