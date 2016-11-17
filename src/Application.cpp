@@ -45,6 +45,8 @@ bool Application::Init()
 
     g = new GPU();
     m = new Memory(g);
+    m->LoadBIOS("/home/BadWolf/Development/Repos/EvEm/bin/Debug/bios.bin");
+    m->LoadROM("/home/BadWolf/Development/Repos/EvEm/bin/Debug/pkred.gb");
     p = new Processor(g, m);
     k = new key();
 
@@ -56,14 +58,14 @@ void Application::Loop()
     while (p->IsRunning() || !glfwWindowShouldClose(window))
     {
         Frame();
-        this->g->Render();
         glClear(GL_COLOR_BUFFER_BIT);
+        this->g->Render();
 
-        glBegin(GL_TRIANGLES);
+        /*glBegin(GL_TRIANGLES);
         glVertex2f(-1, -1);
         glVertex2f(0, 1);
         glVertex2f(1, -1);
-        glEnd();
+        glEnd();*/
 
         glfwSwapBuffers(window);
         glfwPollEvents();

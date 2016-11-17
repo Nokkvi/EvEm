@@ -14,14 +14,34 @@ Memory::~Memory()
 {
 }
 
+void Memory::LoadBIOS(std::string path)
+{
+    std::ifstream file;
+	file.open(path, std::ios::in | std::ios::binary);
+	if (!file)
+        throw -1;
+
+	uint8_t *pointer = &storage[0xE000];
+	while (!file.eof())
+	{
+        file >> *pointer;
+        pointer++;
+	}
+}
+
 void Memory::LoadROM(std::string path)
 {
-    ifstream file;
-	file.open(path, ios::in|ios::binary|ios::ate);
-	file.seekg(0, ios::end);
-	size_t size = file.tellg();
-	file.seekg(0, ios::beg);
-	file.read(this->storage, size);
+    std::ifstream file;
+	file.open(path, std::ios::in | std::ios::binary);
+	if (!file)
+        throw -1;
+
+	uint8_t *pointer = &storage[0];
+	while (!file.eof())
+	{
+        file >> *pointer;
+        pointer++;
+	}
 }
 
 uint8_t Memory::GetByte(uint16_t index)

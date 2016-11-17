@@ -45,8 +45,10 @@ public:
 
     void InitOpcodes();
     uint8_t FetchInstruction();
-
     void ProcessOpcode(uint8_t code);
+
+    uint8_t Get8BitImmediate();
+    uint16_t Get16BitImmediate();
 
     void Render();
 /*

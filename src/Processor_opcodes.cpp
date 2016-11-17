@@ -24,6 +24,21 @@ void Processor::ProcessOpcode(uint8_t code)
     this->tTotal += this->T->GetByte(0);
 }
 
+uint8_t Processor::Get8BitImmediate()
+{
+    uint16_t pc = this->PC->GetWord(0);
+    this->PC->Increment();
+    return this->memory->GetByte(pc);
+}
+
+uint16_t Processor::Get16BitImmediate()
+{
+    uint16_t pc = this->PC->GetWord(0);
+    this->PC->Increment();
+    this->PC->Increment();
+    return this->memory->GetWord(pc);
+}
+
 void Processor::InitOpcodes()
 {
     operations = new std::unordered_map<uint8_t, std::function<void(Processor* p)>>();
@@ -31,9 +46,7 @@ void Processor::InitOpcodes()
         p->NOP();
     };
     (*operations)[0x01] = [](Processor* p) {
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->B, p->C, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
+        p->Load(p->B, p->C, p->Get16BitImmediate());
     };
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
@@ -48,7 +61,7 @@ void Processor::InitOpcodes()
         p->DEC(p->B);
     };
     (*operations)[0x06] = [](Processor* p) {
-        p->Load(p->B, p->memory->GetByte(p->PC->GetWord(0)));
+        p->Load(p->B, p->Get8BitImmediate());
     };
     (*operations)[0x07] = [](Processor* p) {
         p->RLC(p->A);
@@ -74,8 +87,7 @@ void Processor::InitOpcodes()
         p->DEC(p->C);
     };
     (*operations)[0x0E] = [](Processor* p) {
-        p->Load(p->C, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
+        p->Load(p->C, p->Get8BitImmediate());
     };
     (*operations)[0x0F] = [](Processor* p) {
         p->RRC(p->A);
@@ -84,9 +96,7 @@ void Processor::InitOpcodes()
         p->STOP();
     };
     (*operations)[0x11] = [](Processor* p) {
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->D, p->E, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
+        p->Load(p->D, p->E, p->Get16BitImmediate());
     };
     (*operations)[0x12] = [](Processor* p) {
         uint16_t value = ((uint16_t)p->E->GetByte(0) << 8) | ((uint16_t)p->D->GetByte(0));
@@ -102,20 +112,19 @@ void Processor::InitOpcodes()
         p->DEC(p->D);
     };
     (*operations)[0x16] = [](Processor* p) {
-        p->Load(p->D, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
+        p->Load(p->D, p->Get8BitImmediate());
     };
     (*operations)[0x17] = [](Processor* p) {
         p->RL(p->A);
     };
     (*operations)[0x18] = [](Processor* p) {
-        p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
+        p->JR((int8_t)p->Get8BitImmediate());
     };
     (*operations)[0x19] = [](Processor* p) {
         p->ADD(p->H, p->L, p->D, p->E);
     };
     (*operations)[0x1A] = [](Processor* p) {
-        p->Load(p->A, p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0)));
+        p->Load(p->A, p->Get8BitImmediate());
     };
     (*operations)[0x1B] = [](Processor* p) {
         p->DEC(p->D, p->E);
@@ -127,8 +136,7 @@ void Processor::InitOpcodes()
         p->DEC(p->E);
     };
     (*operations)[0x1E] = [](Processor* p) {
-        p->Load(p->E, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
+        p->Load(p->E, p->Get8BitImmediate());
     };
     (*operations)[0x1F] = [](Processor* p) {
         p->RR(p->A);
@@ -136,14 +144,12 @@ void Processor::InitOpcodes()
     (*operations)[0x20] = [](Processor* p) {
         // Check flag for result 0.
         if (true)
-            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+            p->JR((int8_t)p->Get8BitImmediate());
         else
             p->PC->Increment();
     };
     (*operations)[0x21] = [](Processor* p) {
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->H, p->L, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
+        p->Load(p->H, p->L, p->Get16BitImmediate());
     };
     (*operations)[0x22] = [](Processor* p) {
         p->Store_Increment(p->A, p->H, p->L);
@@ -158,8 +164,7 @@ void Processor::InitOpcodes()
         p->DEC(p->H);
     };
     (*operations)[0x26] = [](Processor* p) {
-        p->Load(p->H, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
+        p->Load(p->H, p->Get8BitImmediate());
     };
     (*operations)[0x27] = [](Processor* p) {
         // TODO: Make this genric maybe?
@@ -168,7 +173,7 @@ void Processor::InitOpcodes()
     (*operations)[0x28] = [](Processor* p) {
         // TODO: Check if last result was 0
         if (true)
-            p->JR((int8_t)p->memory->GetByte(p->PC->GetByte(0)));
+            p->JR((int8_t)p->Get8BitImmediate());
     };
     (*operations)[0x29] = [](Processor* p) {
         p->ADD(p->H, p->L, p->H, p->L);
@@ -186,8 +191,7 @@ void Processor::InitOpcodes()
         p->DEC(p->L);
     };
     (*operations)[0x2E] = [](Processor* p) {
-        p->Load(p->L, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
+        p->Load(p->L, p->Get8BitImmediate());
     };
     (*operations)[0x2F] = [](Processor* p) {
         // TODO: Make this genric maybe?
@@ -196,12 +200,10 @@ void Processor::InitOpcodes()
     (*operations)[0x30] = [](Processor* p) {
         // TODO: Only do if no carry last result
         if (true)
-            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+            p->JR((int8_t)p->Get8BitImmediate());
     };
     (*operations)[0x31] = [](Processor* p) {
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->SP, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
+        p->Load(p->SP, p->Get16BitImmediate());
     };
     (*operations)[0x32] = [](Processor* p) {
 

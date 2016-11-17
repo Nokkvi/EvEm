@@ -20,6 +20,7 @@ class Memory
             inBIOS = on;
         };
 
+        void LoadBIOS(std::string path);
         void LoadROM(std::string path);
 
         uint8_t GetByte(uint16_t index);
