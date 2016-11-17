@@ -1,5 +1,10 @@
 #include "../include/Application.h"
 
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    Application::k->handleKeys(key, action);
+}
+
 Application::Application(std::string title, int width, int height)
 {
     this->title = title;
@@ -12,6 +17,7 @@ Application::~Application()
     delete p;
     delete m;
     delete g;
+    delete k;
 
     glfwTerminate();
 }
@@ -28,6 +34,7 @@ bool Application::Init()
         return false;
     }
 
+    glfwSetKeyCallback(this->window, KeyCallback);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK)
     {
@@ -39,6 +46,7 @@ bool Application::Init()
     g = new GPU();
     m = new Memory(g);
     p = new Processor(g, m);
+    k = new key();
 
     return true;
 }

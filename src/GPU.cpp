@@ -8,6 +8,9 @@ GPU::GPU()
     scy = new Register(1);
     tileset = new uint8_t**[384];
 
+    oam = new uint8_t[160];
+    objectdata = new objdata[40];
+
     for (int i = 0; i < 384; i++)
     {
         tileset[i] = new uint8_t*[8];
@@ -104,6 +107,41 @@ void GPU::Reset()
                 this->tileset[i][j][h] = 0;
              }
          }
+    }
+    for (int i = 0, n = 0; i<40; i++, n+=4){
+        this->oam[n+0] = 0;
+        this->oam[n+1] = 0;
+        this->oam[n+2] = 0;
+        this->oam[n+3] = 0;
+        this->objectdata[i].y = -16;
+        this->objectdata[i].x = -8;
+        this->objectdata[i].tile = 0;
+        this->objectdata[i].palette = 0;
+        this->objectdata[i].xflip = 0;
+        this->objectdata[i].yflip = 0;
+        this->objectdata[i].prio = 0;
+        this->objectdata[i].num = 1;
+    }
+}
+
+void GPU::buildobjdata(uint16_t address, uint8_t val){
+    int obj = address >> 2;
+    if(obj < 40){
+        switch(address & 3){
+            //Y-coord
+            case 0: this->objectdata[obj].y = val-16; break;
+            //X-coord
+            case 1: this->objectdata[obj].x = val-8; break;
+            //Data tile
+            case 2: this->objectdata[obj].tile = val; break;
+            //Options
+            case 3:
+                this->objectdata[obj].palette = (val & 0x10) ? 1 : 0;
+                this->objectdata[obj].xflip = (val & 0x20) ? 1 : 0;
+                this->objectdata[obj].yflip = (val & 0x40) ? 1 : 0;
+                this->objectdata[obj].prio = (val & 0x80) ? 1 : 0;
+                break;
+        }
     }
 }
 
