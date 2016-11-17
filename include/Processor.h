@@ -326,10 +326,12 @@ public:
 	void CALL(uint16_t nn);
 	void CALL(uint8_t cc, uint16_t nn);
 
+	//Pop two bytes from stack and jump to that address.
 	void RET();
-	void RETI();
-	void RET();
-	void RST(uint8_t t);
+
+//	void RETI();
+//	void RET();
+//	void RST(uint8_t t);
 
 	/////////////////////////////////////////////////////////
 

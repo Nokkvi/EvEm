@@ -1073,7 +1073,7 @@ void Processor::InitOpcodes()
 		
 	};
 
-	(*operations)[0xE9] = [](Processor* p) {s
+	(*operations)[0xE9] = [](Processor* p) {
 		p->JP(p->H, p->L);
 	};
 

@@ -1050,6 +1050,12 @@ void Processor::CALL(uint8_t cc, uint16_t nn) {
 	}
 }
 
+void Processor::RET() {
+	this->Pop(this->SP, this->Trash8, this->Trash8_2);
+	this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
+	this->SP->SetWord(0, this->SP->GetWord(0) + 2);
+}
+
 void Processor::SCF() {
 	this->F->SetByte(0, this->F->GetByte(0) | 0x10);
 	this->M->SetByte(0, 0x01);
