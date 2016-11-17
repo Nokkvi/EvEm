@@ -980,15 +980,17 @@ void Processor::JP(uint16_t nn) {
 	this->T->SetByte(0, 0x10);
 }
 
-void Processor::JP(uint8_t cc, uint16_t nn) {
+bool Processor::JP(uint8_t cc, uint16_t nn) {
 	if (this->JumpConditions(cc)) {
 		this->PC->SetWord(0, nn);
 		this->M->SetByte(0, 0x04);
 		this->T->SetByte(0, 0x10);
+		return true;
 	}
 	else {
 		this->M->SetByte(0, 0x03);
 		this->T->SetByte(0, 0x0C);
+		return false;
 	}
 }
 
@@ -998,15 +1000,17 @@ void Processor::JR(int8_t n) {
 	this->T->SetByte(0, 0x0C);
 }
 
-void Processor::JP(uint8_t cc, int8_t n) {
+bool Processor::JR(uint8_t cc, int8_t n) {
 	if (this->JumpConditions(cc)) {
 		this->PC->SetWord(0, this->PC->GetWord(0) + n);
 		this->M->SetByte(0, 0x03);
 		this->T->SetByte(0, 0x0C);
+		return true;
 	}
 	else {
 		this->M->SetByte(0, 0x02);
 		this->T->SetByte(0, 0x08);
+		return false;
 	}
 }
 
@@ -1016,19 +1020,35 @@ void Processor::JP(Register* H, Register* L) {
 	this->T->SetByte(0, 0x04);
 }
 
-//------------------------------------------------------------------------------------
-/*void Processor::BIT(Bit b, Register* X){
+
+////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+void Processor::CALL(uint16_t nn) {
+	this->Trash8->SetByte(0, this->PC->GetByte(1));
+	this->Trash8_2->SetByte(0, this->PC->GetByte(0));
+	Push(this->SP, this->Trash8, this->Trash8_2);
+	this->PC->SetWord(0, nn);
+	this->SP->SetWord(0, this->SP->GetWord(0) - 2);
+	this->M->SetByte(0, 0x06);
+	this->M->SetByte(0, 0x18);
 }
-void Processor::BIT(Bit b){
+
+void Processor::CALL(uint8_t cc, uint16_t nn) {
+	if (this->JumpConditions(cc)) {
+		this->Trash8->SetByte(0, this->PC->GetByte(1));
+		this->Trash8_2->SetByte(0, this->PC->GetByte(0));
+		Push(this->SP, this->Trash8, this->Trash8_2);
+		this->PC->SetWord(0, nn);
+		this->SP->SetWord(0, this->SP->GetWord(0) - 2);
+		this->M->SetByte(0, 0x06);
+		this->M->SetByte(0, 0x18);
+	}
+	else {
+		this->M->SetByte(0, 0x03);
+		this->M->SetByte(0, 0x0C);
+	}
 }
-void Processor::SET(Bit b, Register* X){
-}
-void Processor::SET(Bit b){
-}
-void Processor::RES(Bit b, Register* X){
-}
-void Processor::RES(Bit b){
-}*/
 
 void Processor::SCF() {
 	this->F->SetByte(0, this->F->GetByte(0) | 0x10);

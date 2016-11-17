@@ -297,10 +297,10 @@ public:
 		void SWAP(Register* H, Register* L);
 
 		void JP(uint16_t nn);
-		void JP(uint8_t cc, uint16_t nn);
+		bool JP(uint8_t cc, uint16_t nn);
 
 		void JR(int8_t n);
-		void JP(uint8_t cc, int8_t n);
+		bool JR(uint8_t cc, int8_t n);
 
 		void JP(Register* H, Register* L);
 		
@@ -323,10 +323,19 @@ public:
 
     //   General purpose Arithmetic and CPU control
 
+	void CALL(uint16_t nn);
+	void CALL(uint8_t cc, uint16_t nn);
 
-    void DAA();
+	void RET();
+	void RETI();
+	void RET();
+	void RST(uint8_t t);
 
-    void CPL();
+	/////////////////////////////////////////////////////////
+
+	void DAA();
+	void CPL();
+
 
     void CCF();
 

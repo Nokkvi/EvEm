@@ -11,11 +11,10 @@ uint8_t Processor::FetchInstruction()
     return memory->GetByte(pc);
 };
 
-<<<<<<< HEAD
+
 void Processor::ProcessOpcode(uint8_t code)
 {
-=======
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
+
     (*operations)[code](this);
     if (this->cbInstruction)
     {
@@ -27,7 +26,7 @@ void Processor::ProcessOpcode(uint8_t code)
     this->tTotal += this->T->GetByte(0);
 }
 
-<<<<<<< HEAD
+
 uint8_t Processor::Get8BitImmediate()
 {
     uint16_t pc = this->PC->GetWord(0);
@@ -41,315 +40,303 @@ uint16_t Processor::Get16BitImmediate()
     this->PC->Increment();
     this->PC->Increment();
     return this->memory->GetWord(pc);
-=======
-        (*cboperations)[code](this);
-    }
-    this->mTotal += this->M->GetByte(0);
-    this->tTotal += this->T->GetByte(0);
-    // Increment program counter and prevent it from going over limit?
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
+
 }
 
 void Processor::InitOpcodes()
 {
-  /*  operations = new std::unordered_map<uint8_t, std::function<void(Processor* p)>>();
+	operations = new std::unordered_map<uint8_t, std::function<void(Processor* p)>>();
+
     (*operations)[0x00] = [](Processor* p) {
         p->NOP();
     };
+
     (*operations)[0x01] = [](Processor* p) {
-<<<<<<< HEAD
-<<<<<<< HEAD
+
         p->Load(p->B, p->C, p->Get16BitImmediate());
-=======
-        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
-        p->Load(p->B, p->C, p->memory->GetByte(p->PC->GetWord(0)));
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
-=======
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->B, p->C, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
+
     };
+
     (*operations)[0x02] = [](Processor* p) {
         p->Store(p->A, p->B, p->C);
     };
+
     (*operations)[0x03] = [](Processor* p) {
         p->INC(p->B, p->C);
     };
+
     (*operations)[0x04] = [](Processor* p) {
         p->INC(p->B);
     };
+
     (*operations)[0x05] = [](Processor* p) {
         p->DEC(p->B);
     };
+
     (*operations)[0x06] = [](Processor* p) {
-<<<<<<< HEAD
-        p->Load(p->B, p->Get8BitImmediate());
-=======
-        p->Load(p->B, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
+		p->Load(p->B, p->Get8BitImmediate());
     };
+
     (*operations)[0x07] = [](Processor* p) {
         p->RLC(p->A);
     };
+
     (*operations)[0x08] = [](Processor* p) {
         uint16_t word = p->PC->GetWord(0);
-<<<<<<< HEAD
-<<<<<<< HEAD
         p->Store(p->SP, word);
-=======
-        p->Store(p->SP, p->memory->GetWord(word));
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
-=======
-        p->Store(p->SP, word);
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
         p->PC->SetWord(0, word + 2);
     };
+
     (*operations)[0x09] = [](Processor* p) {
-        p->ADD(p->B, p->C, p->H, p->L);
+        p->ADDPairs(p->B, p->C, p->H, p->L);
+		p->PC->SetWord(0, p->PC->GetWord(0) + 2);
     };
+
     (*operations)[0x0A] = [](Processor* p) {
         p->Load(p->A, p->B, p->C);
     };
+
     (*operations)[0x0B] = [](Processor* p) {
         p->DEC(p->B, p->C);
     };
+
     (*operations)[0x0C] = [](Processor* p) {
         p->INC(p->C);
     };
+
     (*operations)[0x0D] = [](Processor* p) {
         p->DEC(p->C);
     };
+
     (*operations)[0x0E] = [](Processor* p) {
-<<<<<<< HEAD
+
         p->Load(p->C, p->Get8BitImmediate());
-=======
-        p->Load(p->C, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
+
     };
+
     (*operations)[0x0F] = [](Processor* p) {
         p->RRC(p->A);
     };
+
     (*operations)[0x10] = [](Processor* p) {
         p->STOP();
     };
+
     (*operations)[0x11] = [](Processor* p) {
-<<<<<<< HEAD
+
         p->Load(p->D, p->E, p->Get16BitImmediate());
     };
+
     (*operations)[0x12] = [](Processor* p) {
         uint16_t value = ((uint16_t)p->E->GetByte(0) << 8) | ((uint16_t)p->D->GetByte(0));
         p->Store(p->A, value);
     };
+
     (*operations)[0x13] = [](Processor* p) {
         p->INC(p->D, p->E);
     };
+
     (*operations)[0x14] = [](Processor* p) {
         p->INC(p->D);
     };
+
     (*operations)[0x15] = [](Processor* p) {
         p->DEC(p->D);
     };
+
     (*operations)[0x16] = [](Processor* p) {
         p->Load(p->D, p->Get8BitImmediate());
     };
+
     (*operations)[0x17] = [](Processor* p) {
         p->RL(p->A);
     };
+
     (*operations)[0x18] = [](Processor* p) {
+
         p->JR((int8_t)p->Get8BitImmediate());
+
     };
+
     (*operations)[0x19] = [](Processor* p) {
-        p->ADD(p->H, p->L, p->D, p->E);
+        p->ADDPairs(p->H, p->L, p->D, p->E);
     };
+
     (*operations)[0x1A] = [](Processor* p) {
-<<<<<<< HEAD
+
         p->Load(p->A, p->Get8BitImmediate());
-=======
-        p->Load(p->A, p->memory->GetByte((((uint16_t)p->E->GetByte(0)) << 8) | p->D->GetByte(0)));
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
+
     };
+
     (*operations)[0x1B] = [](Processor* p) {
         p->DEC(p->D, p->E);
     };
+
     (*operations)[0x1C] = [](Processor* p) {
         p->INC(p->E);
     };
+
     (*operations)[0x1D] = [](Processor* p) {
         p->DEC(p->E);
     };
+
     (*operations)[0x1E] = [](Processor* p) {
         p->Load(p->E, p->Get8BitImmediate());
     };
+
     (*operations)[0x1F] = [](Processor* p) {
         p->RR(p->A);
     };
+
     (*operations)[0x20] = [](Processor* p) {
+
         // Check flag for result 0.
         if (true)
             p->JR((int8_t)p->Get8BitImmediate());
         else
             p->PC->Increment();
+
     };
+
     (*operations)[0x21] = [](Processor* p) {
         p->Load(p->H, p->L, p->Get16BitImmediate());
     };
+
     (*operations)[0x22] = [](Processor* p) {
         p->Store_Increment(p->A, p->H, p->L);
     };
+
     (*operations)[0x23] = [](Processor* p) {
         p->INC(p->H, p->L);
     };
+
     (*operations)[0x24] = [](Processor* p) {
         p->INC(p->H);
     };
+
     (*operations)[0x25] = [](Processor* p) {
         p->DEC(p->H);
     };
+
     (*operations)[0x26] = [](Processor* p) {
         p->Load(p->H, p->Get8BitImmediate());
     };
+
     (*operations)[0x27] = [](Processor* p) {
         // TODO: Make this genric maybe?
-        p->DAA();
+        //p->DAA();
     };
+
     (*operations)[0x28] = [](Processor* p) {
+
         // TODO: Check if last result was 0
         if (true)
             p->JR((int8_t)p->Get8BitImmediate());
+
     };
+
     (*operations)[0x29] = [](Processor* p) {
-        p->ADD(p->H, p->L, p->H, p->L);
+        p->ADDPairs(p->H, p->L, p->H, p->L);
     };
+
     (*operations)[0x2A] = [](Processor* p) {
         p->Load_Increment(p->A, p->H, p->L);
     };
+
     (*operations)[0x2B] = [](Processor* p) {
         p->DEC(p->H, p->L);
     };
+
     (*operations)[0x2C] = [](Processor* p) {
         p->INC(p->L);
     };
+
     (*operations)[0x2D] = [](Processor* p) {
         p->DEC(p->L);
     };
+
     (*operations)[0x2E] = [](Processor* p) {
-<<<<<<< HEAD
+
         p->Load(p->L, p->Get8BitImmediate());
-=======
-        p->Load(p->L, p->memory->GetByte(p->PC->GetWord(0)));
-        p->PC->Increment();
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
+
     };
+
     (*operations)[0x2F] = [](Processor* p) {
         // TODO: Make this genric maybe?
-        p->CPL();
+        //p->CPL();
     };
+
     (*operations)[0x30] = [](Processor* p) {
+
         // TODO: Only do if no carry last result
         if (true)
-<<<<<<< HEAD
+
             p->JR((int8_t)p->Get8BitImmediate());
     };
     (*operations)[0x31] = [](Processor* p) {
         p->Load(p->SP, p->Get16BitImmediate());
-=======
-            p->JR((int8_t)p->memory->GetByte(p->PC->GetWord(0)));
+
     };
-    (*operations)[0x31] = [](Processor* p) {
-        uint16_t value = p->PC->GetWord(0);
-        p->Load(p->SP, p->memory->GetWord(value));
-        p->PC->SetWord(0, value + 2);
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
-    };
+
     (*operations)[0x32] = [](Processor* p) {
 
     };
+
     (*operations)[0x33] = [](Processor* p) {
 
     };
+
     (*operations)[0x34] = [](Processor* p) {
 
     };
+
     (*operations)[0x35] = [](Processor* p) {
 
     };
+
     (*operations)[0x36] = [](Processor* p) {
 
+
     };
+
     (*operations)[0x37] = [](Processor* p) {
 
     };
-    (*operations)[0x38] = [](Processor* p) {
 
+    (*operations)[0x38] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->JR(0x03, (int8_t)p->memory->GetByte(value));
     };
+
     (*operations)[0x39] = [](Processor* p) {
 
     };
+
     (*operations)[0x3A] = [](Processor* p) {
 
     };
+
     (*operations)[0x3B] = [](Processor* p) {
 
     };
+
     (*operations)[0x3C] = [](Processor* p) {
 
     };
+
     (*operations)[0x3D] = [](Processor* p) {
 
     };
+
     (*operations)[0x3E] = [](Processor* p) {
 
     };
+
     (*operations)[0x3F] = [](Processor* p) {
-<<<<<<< HEAD
-=======
-        uint16_t immediate = ((uint16_t)p->PC->GetByte(1) << 8) | p->PC->GetByte(0);
-        p->Load(p->D, p->E, immediate);
-    };
-    (*operations)[0x12] = [](Processor* p) {
 
     };
-    (*operations)[0x13] = [](Processor* p) {
-
-    };
-    (*operations)[0x14] = [](Processor* p) {
-
-    };
-    (*operations)[0x15] = [](Processor* p) {
-
-    };
-    (*operations)[0x16] = [](Processor* p) {
-
-    };
-    (*operations)[0x17] = [](Processor* p) {
-
-    };
-    (*operations)[0x18] = [](Processor* p) {
-
-    };
-    (*operations)[0x19] = [](Processor* p) {
-
-    };
-    (*operations)[0x20] = [](Processor* p) {
-
-    };
-    (*operations)[0x21] = [](Processor* p) {
->>>>>>> Started work on opcodes and added some quality of life functions to Registers
-=======
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
-
-    };
-
 	
-
-
-    (*operations)[0x80] = [](Processor* p) {
-        p->ADD(p->A, p->B);
-    };
-	*/
 //--------------------------------------------------------------
 	
 	(*operations)[0x40] = [](Processor* p) {
@@ -898,6 +885,223 @@ void Processor::InitOpcodes()
 	};
 
 //-----------------------------------------------------------
+
+	(*operations)[0xC0] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC1] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC2] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->PC->Increment();
+		p->JP(0x00, p->memory->GetWord(value));
+	};
+
+	(*operations)[0xC3] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->PC->Increment();
+		p->JP(p->memory->GetWord(value));
+	};
+
+	(*operations)[0xC4] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC5] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC6] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC7] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC8] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xC9] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xCA] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->JP(0x01, p->memory->GetWord(value));
+		p->PC->SetWord(0, value + 2);
+	};
+
+	(*operations)[0xCB] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xCC] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xCD] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->PC->Increment();
+		p->CALL(p->memory->GetWord(0));
+	};
+
+	(*operations)[0xCE] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xCF] = [](Processor* p) {
+		
+	};
+
+//-----------------------------------------------------------
+
+	(*operations)[0xD0] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD1] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD2] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->PC->Increment();
+		p->JP(0x02, p->memory->GetWord(value));
+	};
+
+	(*operations)[0xD3] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->JP(p->memory->GetWord(value));
+		p->PC->SetWord(0, value + 2);
+	};
+
+	(*operations)[0xD4] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD5] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD6] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD7] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD8] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xD9] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xDA] = [](Processor* p) {
+		uint16_t value = p->PC->GetWord(0);
+		p->PC->Increment();
+		p->PC->Increment();
+		p->JP(0x03, p->memory->GetWord(value));
+	};
+
+	(*operations)[0xDB] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xDC] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xDD] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xDE] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xDF] = [](Processor* p) {
+		
+	};
+
+//---------------------------------------------------------------------
+
+	(*operations)[0xE0] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE1] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE2] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE3] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE4] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE5] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE6] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE7] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE8] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xE9] = [](Processor* p) {s
+		p->JP(p->H, p->L);
+	};
+
+	(*operations)[0xEA] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xEB] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xEC] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xED] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xEE] = [](Processor* p) {
+		
+	};
+
+	(*operations)[0xEF] = [](Processor* p) {
+		
+	};
+
+//---------------------------------------------------------------------
 
 	(*operations)[0xF0] = [](Processor* p) {
 		//LDH A,(n)
