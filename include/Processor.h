@@ -28,7 +28,7 @@ public:
 	Register* Trash16_2 = new Register(2);
 
 	//Flags
-	
+
 	/*Is set if the result of a math operation is 0 or two values match when
 	using CP.*/
 	bool ZeroFlag = false;
@@ -42,7 +42,7 @@ public:
 	math operation or if register A is the smaller value
 	when executing the CP instruction.*/
 	bool CarryFlag = false;
-	
+
     //Clock registers
     Register* M;
     Register* T;
@@ -111,11 +111,6 @@ public:
             // Loads into 16 bit register r the values in register pair XY, simultaneously decrement the contents of register pair XY.
             void Load_Decrement(Register* r, Register* X, Register* Y);
 
-<<<<<<< HEAD
-    // From Immediate
-
-=======
->>>>>>> Rewrote the Load and Store functions in the Processor and fixed some typos.
     /*To Memory*/
 
         /*From Register*/
@@ -234,7 +229,7 @@ public:
 		void SBC(Register* X, Register* Y);
 		void SBC(Register* X, uint8_t n);
 		void SBC(Register* X, Register* H, Register* L);
-		
+
 		void AND(Register* X, Register* Y);
 		void AND(Register* X, uint8_t n);
 		void AND(Register* X, Register* H, Register* L);
@@ -303,9 +298,9 @@ public:
 		bool JR(uint8_t cc, int8_t n);
 
 		void JP(Register* H, Register* L);
-		
 
-		
+
+
 
 
     //   Bit manipulation
@@ -358,7 +353,7 @@ public:
     //Pop(Register* SP);
     //ClearCarryFlag(Register* F);
     void Reset();
-		
+
 };
 
 #endif	/* PROCESSOR_H */

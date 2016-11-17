@@ -336,9 +336,9 @@ void Processor::InitOpcodes()
     (*operations)[0x3F] = [](Processor* p) {
 
     };
-	
+
 //--------------------------------------------------------------
-	
+
 	(*operations)[0x40] = [](Processor* p) {
 		p->Load(p->B, p->B);
 	};
@@ -575,7 +575,7 @@ void Processor::InitOpcodes()
 		p->Store(p->A, p->H, p->L);
 	};
 //-----------------------------------------------------------
-	
+
 	(*operations)[0x78] = [](Processor* p) {
 		p->Load(p->A, p->B);
 	};
@@ -887,11 +887,11 @@ void Processor::InitOpcodes()
 //-----------------------------------------------------------
 
 	(*operations)[0xC0] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC1] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC2] = [](Processor* p) {
@@ -909,27 +909,27 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xC4] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC5] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC6] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC7] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC8] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xC9] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xCA] = [](Processor* p) {
@@ -939,36 +939,33 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xCB] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xCC] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xCD] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->PC->Increment();
-		p->CALL(p->memory->GetWord(0));
+		p->CALL(p->Get16BitImmediate());
 	};
 
 	(*operations)[0xCE] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xCF] = [](Processor* p) {
-		
+
 	};
 
 //-----------------------------------------------------------
 
 	(*operations)[0xD0] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD1] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD2] = [](Processor* p) {
@@ -985,27 +982,27 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xD4] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD5] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD6] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD7] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD8] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xD9] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xDA] = [](Processor* p) {
@@ -1016,61 +1013,61 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xDB] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xDC] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xDD] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xDE] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xDF] = [](Processor* p) {
-		
+
 	};
 
 //---------------------------------------------------------------------
 
 	(*operations)[0xE0] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE1] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE2] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE3] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE4] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE5] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE6] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE7] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE8] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xE9] = [](Processor* p) {
@@ -1078,27 +1075,27 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xEA] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xEB] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xEC] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xED] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xEE] = [](Processor* p) {
-		
+
 	};
 
 	(*operations)[0xEF] = [](Processor* p) {
-		
+
 	};
 
 //---------------------------------------------------------------------
