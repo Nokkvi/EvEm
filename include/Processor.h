@@ -311,14 +311,14 @@ public:
     //   Bit manipulation
 
 
-    void BIT(uint8_t b, Register* X);
-    void BIT(uint8_t b);
+    void BIT(uint8_t n, Register* X);
+    void BIT(uint8_t n, Register* H, Register* L);
 
-    void SET(uint8_t b, Register* X);
-    void SET(uint8_t b);
+    void SET(uint8_t n, Register* X);
+	void SET(uint8_t n, Register* H, Register* L);
 
-    void RES(uint8_t b, Register* X);
-    void RES(uint8_t b);
+    void RES(uint8_t n, Register* X);
+    void RES(uint8_t n, Register* H, Register* L);
 
 
     //   General purpose Arithmetic and CPU control

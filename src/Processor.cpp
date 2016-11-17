@@ -899,9 +899,58 @@ void Processor::SWAP(Register* H, Register* L) {
 
 //Bit Operations
 
-/*void Processor::BIT(Register* X, uint8_t bit) {
+void Processor::BIT(uint8_t n, Register* X) {
+	if (!X->GetBit(n & 0b111)) {
+		this->ZeroFlag = true;
+	}
+	this->SubtractionFlag = false;
+	this->HalfCarryFlag = true;
+	this->M->SetByte(0, 0x02);
+	this->T->SetByte(0, 0x08);
+}
 
-}*/
+void Processor::BIT(uint8_t n, Register* H, Register* L) {
+	this->Trash8->SetByte(0, this->FromMemory(H, L));
+	if (this->Trash8->GetBit(n & 0b111)) {
+		this->ZeroFlag = true;
+	}
+	this->SubtractionFlag = false;
+	this->HalfCarryFlag = true;
+	this->M->SetByte(0, 0x03);
+	this->T->SetByte(0, 0x0C);
+}
+
+void Processor::SET(uint8_t n, Register* X) {
+	X->SetBit(n & 0b111, true);
+	this->M->SetByte(0, 0x02);
+	this->T->SetByte(0, 0x08);
+}
+
+void Processor::SET(uint8_t n, Register* H, Register* L) {
+	this->Trash8->SetByte(0, this->FromMemory(H, L));
+	this->Trash8->SetBit(n & 0b111, 1);
+	this->SubtractionFlag = false;
+	this->HalfCarryFlag = true;
+	this->ToMemory(H, L, this->Trash8->GetByte(0));
+	this->M->SetByte(0, 0x04);
+	this->T->SetByte(0, 0x10);
+}
+
+void Processor::RES(uint8_t n, Register* X) {
+	X->SetBit(n & 0b111, 0);
+	this->M->SetByte(0, 0x02);
+	this->T->SetByte(0, 0x08);
+}
+
+void Processor::RES(uint8_t n, Register* H, Register* L) {
+	this->Trash8->SetByte(0, this->FromMemory(H, L));
+	this->Trash8->SetBit(n & 0b111, 0);
+	this->ToMemory(H, L, this->Trash8->GetByte(0));
+	this->M->SetByte(0, 0x04);
+	this->T->SetByte(0, 0x10);
+}
+
+//-----------------------------------------------------------------------------------------
 
 bool Processor::JumpConditions(uint8_t cc) {
 	bool success = false;
@@ -1014,16 +1063,4 @@ void Processor::HALT() {
 	this->_halt = 1;
 	this->M->SetByte(0, 0x01);
 	this->T->SetByte(0, 0x04);
-}
-
-void Processor::STOP() {
-
-}
-
-void Processor::DI() {
-
-}
-
-void Processor::EI() {
-
 }

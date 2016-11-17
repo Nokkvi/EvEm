@@ -58,13 +58,6 @@ void Application::Loop()
     while (p->IsRunning() || !glfwWindowShouldClose(window))
     {
 
-		p->C->SetByte(0, 0x00);
-		p->D->SetByte(0, 0xFF);
-		//p->SWAP(p->C);
-		//p->ADD(p->C, p->D);
-		//bool a = 0, b = 0, c = 1;
-	
-
         Frame();
         glClear(GL_COLOR_BUFFER_BIT);
         this->g->Render();
