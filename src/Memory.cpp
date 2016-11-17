@@ -1,15 +1,28 @@
 #include "../include/Memory.h"
 
+#include <iostream>
+#include <fstream>
+#include <cstddef>
+
 Memory::Memory(GPU* gpu)
 {
     this->gpu = gpu;
-    inBIOS = false;
+    inBIOS = true;
 }
 
 Memory::~Memory()
 {
 }
 
+void Memory::LoadROM(std::string path)
+{
+    ifstream file;
+	file.open(path, ios::in|ios::binary|ios::ate);
+	file.seekg(0, ios::end);
+	size_t size = file.tellg();
+	file.seekg(0, ios::beg);
+	file.read(this->storage, size);
+}
 
 uint8_t Memory::GetByte(uint16_t index)
 {

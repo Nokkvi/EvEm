@@ -28,7 +28,7 @@ public:
 
     unsigned int mTotal, tTotal;
 
-    bool cbInstruction = false;
+    bool cbInstruction;
 
     uint16_t _halt, _stop, _ime;
     Memory* memory;

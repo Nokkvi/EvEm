@@ -3,6 +3,7 @@
 
 #include "Definitions.h"
 #include "GPU.h"
+#include <string>
 
 class Memory
 {
@@ -18,6 +19,8 @@ class Memory
         {
             inBIOS = on;
         };
+
+        void LoadROM(std::string path);
 
         uint8_t GetByte(uint16_t index);
         uint16_t GetWord(uint16_t index);

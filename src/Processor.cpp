@@ -7,10 +7,6 @@ Processor::Processor(GPU* gpu, Memory* memory)
     //pMemory->SetProcessor(this);
     InitOpcodes();
 
-    this->_halt = 0;
-    this->_ime = 0;
-    this->_stop = 0;
-
     this->A = new Register(1);
     this->B = new Register(1);
     this->C = new Register(1);
@@ -25,6 +21,8 @@ Processor::Processor(GPU* gpu, Memory* memory)
 
     this->M = new Register(1);
     this->T = new Register(1);
+
+    Reset();
 }
 
 Processor::~Processor()
@@ -44,18 +42,22 @@ Processor::~Processor()
     delete T;
 }
 void Processor::Reset(){
-    this->A->SetByte(0, 0x00);
-    this->B->SetByte(0, 0x00);
-    this->C->SetByte(0, 0x00);
-    this->D->SetByte(0, 0x00);
-    this->E->SetByte(0, 0x00);
-    this->H->SetByte(0, 0x00);
-    this->L->SetByte(0, 0x00);
-    this->F->SetByte(0, 0x00);
-    this->PC->SetByte(0, 0x00);
-    this->SP->SetByte(0, 0x00);
-    this->M->SetByte(0, 0x00);
-    this->T->SetByte(0, 0x00);
+    this->A->SetByte(0, 0);
+    this->B->SetByte(0, 0);
+    this->C->SetByte(0, 0);
+    this->D->SetByte(0, 0);
+    this->E->SetByte(0, 0);
+    this->H->SetByte(0, 0);
+    this->L->SetByte(0, 0);
+    this->F->SetByte(0, 0);
+    this->PC->SetWord(0, 0);
+    this->SP->SetWord(0, 0);
+    this->M->SetByte(0, 0);
+    this->T->SetByte(0, 0);
+
+    this->memory->SetBIOS(true);
+
+    cbInstruction = false;
 
     this->_halt = 0;
     this->_ime = 1;
