@@ -52,9 +52,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x01] = [](Processor* p) {
-
         p->Load(p->B, p->C, p->Get16BitImmediate());
-
     };
 
     (*operations)[0x02] = [](Processor* p) {
@@ -62,7 +60,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x03] = [](Processor* p) {
-        p->INC(p->B, p->C);
+        p->INCPair(p->B, p->C);
     };
 
     (*operations)[0x04] = [](Processor* p) {
@@ -78,18 +76,15 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x07] = [](Processor* p) {
-        p->RLC(p->A);
+        p->RLCA();
     };
 
     (*operations)[0x08] = [](Processor* p) {
-        uint16_t word = p->PC->GetWord(0);
-        p->Store(p->SP, word);
-        p->PC->SetWord(0, word + 2);
+        p->Store(p->SP, p->Get16BitImmediate());        
     };
 
     (*operations)[0x09] = [](Processor* p) {
         p->ADDPairs(p->B, p->C, p->H, p->L);
-		p->PC->SetWord(0, p->PC->GetWord(0) + 2);
     };
 
     (*operations)[0x0A] = [](Processor* p) {
@@ -97,7 +92,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x0B] = [](Processor* p) {
-        p->DEC(p->B, p->C);
+        p->DECPair(p->B, p->C);
     };
 
     (*operations)[0x0C] = [](Processor* p) {
@@ -115,7 +110,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x0F] = [](Processor* p) {
-        p->RRC(p->A);
+        p->RRCA();
     };
 
     (*operations)[0x10] = [](Processor* p) {
@@ -133,7 +128,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x13] = [](Processor* p) {
-        p->INC(p->D, p->E);
+        p->INCPair(p->D, p->E);
     };
 
     (*operations)[0x14] = [](Processor* p) {
@@ -149,13 +144,11 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x17] = [](Processor* p) {
-        p->RL(p->A);
+        p->RLA();
     };
 
     (*operations)[0x18] = [](Processor* p) {
-
         p->JR((int8_t)p->Get8BitImmediate());
-
     };
 
     (*operations)[0x19] = [](Processor* p) {
@@ -169,7 +162,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x1B] = [](Processor* p) {
-        p->DEC(p->D, p->E);
+        p->DECPair(p->D, p->E);
     };
 
     (*operations)[0x1C] = [](Processor* p) {
@@ -185,17 +178,11 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x1F] = [](Processor* p) {
-        p->RR(p->A);
+        p->RRA();
     };
 
     (*operations)[0x20] = [](Processor* p) {
-
-        // Check flag for result 0.
-        if (true)
-            p->JR((int8_t)p->Get8BitImmediate());
-        else
-            p->PC->Increment();
-
+		p->JR(0x00, (int8_t)p->Get8BitImmediate());
     };
 
     (*operations)[0x21] = [](Processor* p) {
@@ -207,7 +194,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x23] = [](Processor* p) {
-        p->INC(p->H, p->L);
+        p->INCPair(p->H, p->L);
     };
 
     (*operations)[0x24] = [](Processor* p) {
@@ -223,16 +210,11 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x27] = [](Processor* p) {
-        // TODO: Make this genric maybe?
-        //p->DAA();
+		p->DAA();
     };
 
     (*operations)[0x28] = [](Processor* p) {
-
-        // TODO: Check if last result was 0
-        if (true)
-            p->JR((int8_t)p->Get8BitImmediate());
-
+		p->JR(0x01, (int8_t)p->Get8BitImmediate());
     };
 
     (*operations)[0x29] = [](Processor* p) {
@@ -244,7 +226,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x2B] = [](Processor* p) {
-        p->DEC(p->H, p->L);
+        p->DECPair(p->H, p->L);
     };
 
     (*operations)[0x2C] = [](Processor* p) {
@@ -262,17 +244,14 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x2F] = [](Processor* p) {
-        // TODO: Make this genric maybe?
-        //p->CPL();
+		p->CPL();
     };
 
     (*operations)[0x30] = [](Processor* p) {
 
-        // TODO: Only do if no carry last result
-        if (true)
-
-            p->JR((int8_t)p->Get8BitImmediate());
+		p->JR(0x02, (int8_t)p->Get8BitImmediate());
     };
+
     (*operations)[0x31] = [](Processor* p) {
         p->Load(p->SP, p->Get16BitImmediate());
 
@@ -283,15 +262,22 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x33] = [](Processor* p) {
-
+		if (p->SP->GetWord(0) == 0xFFFF) {
+			p->SP->SetWord(0, 0x0000);
+		}
+		else {
+			p->SP->SetWord(0, p->SP->GetWord(0) + 0x01);
+		}
+		p->M->SetByte(0, 0x02);
+		p->T->SetByte(0, 0x08);
     };
 
     (*operations)[0x34] = [](Processor* p) {
-
+		p->INC(p->H, p->L);
     };
 
     (*operations)[0x35] = [](Processor* p) {
-
+		p->DEC(p->H, p->L);
     };
 
     (*operations)[0x36] = [](Processor* p) {
@@ -300,33 +286,39 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x37] = [](Processor* p) {
-
+		p->SCF();
     };
 
     (*operations)[0x38] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->JR(0x03, (int8_t)p->memory->GetByte(value));
+		p->JR(0x03, (int8_t)p->Get8BitImmediate());
     };
 
     (*operations)[0x39] = [](Processor* p) {
-
+		p->Trash8->SetByte(0, p->SP->GetByte(1));
+		p->Trash8_2->SetByte(0, p->SP->GetByte(0));
+		p->ADDPairs(p->H, p->L, p->Trash8, p->Trash8_2);
     };
 
     (*operations)[0x3A] = [](Processor* p) {
-
     };
 
     (*operations)[0x3B] = [](Processor* p) {
-
+		if (p->SP->GetWord(0) == 0) {
+			p->SP->SetWord(0, 0xFFFF);
+		}
+		else {
+			p->SP->SetWord(0, p->SP->GetWord(0) - 0x01);
+		}
+		p->M->SetByte(0, 0x02);
+		p->T->SetByte(0, 0x08);
     };
 
     (*operations)[0x3C] = [](Processor* p) {
-
+		p->INC(p->A);
     };
 
     (*operations)[0x3D] = [](Processor* p) {
-
+		p->DEC(p->A);
     };
 
     (*operations)[0x3E] = [](Processor* p) {
@@ -334,7 +326,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x3F] = [](Processor* p) {
-
+		p->CCF();
     };
 
 //--------------------------------------------------------------
@@ -568,7 +560,7 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0x76] = [](Processor* p) {
-		//HALT
+		p->HALT();
 	};
 
 	(*operations)[0x77] = [](Processor* p) {
@@ -891,59 +883,57 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xC1] = [](Processor* p) {
+		p->RET(0x00);
+	};
 
+	(*operations)[0xC1] = [](Processor* p) {
+		p->Pop(p->B, p->C);
 	};
 
 	(*operations)[0xC2] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->PC->Increment();
-		p->JP(0x00, p->memory->GetWord(value));
+		p->JP(0x00, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xC3] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->PC->Increment();
-		p->JP(p->memory->GetWord(value));
+		p->JP(p->Get16BitImmediate());
 	};
 
 	(*operations)[0xC4] = [](Processor* p) {
-
+		p->CALL(0x00, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xC5] = [](Processor* p) {
-
+		p->Push(p->B, p->C);
 	};
 
 	(*operations)[0xC6] = [](Processor* p) {
-
+		p->ADD(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xC7] = [](Processor* p) {
-
+		p->RST(0x00);
 	};
 
 	(*operations)[0xC8] = [](Processor* p) {
-
+		p->RET(0x01);
 	};
 
 	(*operations)[0xC9] = [](Processor* p) {
-
+		p->RET();
 	};
 
 	(*operations)[0xCA] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->JP(0x01, p->memory->GetWord(value));
-		p->PC->SetWord(0, value + 2);
+		p->JP(0x01, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xCB] = [](Processor* p) {
-
+		/*
+			EXT OPS
+		*/
 	};
 
 	(*operations)[0xCC] = [](Processor* p) {
-
+		p->CALL(0x01, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xCD] = [](Processor* p) {
@@ -951,28 +941,25 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xCE] = [](Processor* p) {
-
+		p->ADC(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xCF] = [](Processor* p) {
-
+		p->RST(0x01);
 	};
 
 //-----------------------------------------------------------
 
 	(*operations)[0xD0] = [](Processor* p) {
-
+		p->RET(0x02);
 	};
 
 	(*operations)[0xD1] = [](Processor* p) {
-
+		p->Pop(p->D, p->E);
 	};
 
 	(*operations)[0xD2] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->PC->Increment();
-		p->JP(0x02, p->memory->GetWord(value));
+		p->JP(0x02, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xD3] = [](Processor* p) {
@@ -982,92 +969,89 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xD4] = [](Processor* p) {
-
+		p->CALL(0x02, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xD5] = [](Processor* p) {
-
+		p->Push(p->D, p->E);
 	};
 
 	(*operations)[0xD6] = [](Processor* p) {
-
+		p->SUB(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xD7] = [](Processor* p) {
-
+		p->RST(0x02);
 	};
 
 	(*operations)[0xD8] = [](Processor* p) {
-
+		p->RET(0x03);
 	};
 
 	(*operations)[0xD9] = [](Processor* p) {
-
+		p->RETI();
 	};
 
 	(*operations)[0xDA] = [](Processor* p) {
-		uint16_t value = p->PC->GetWord(0);
-		p->PC->Increment();
-		p->PC->Increment();
-		p->JP(0x03, p->memory->GetWord(value));
+		p->JP(0x01, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xDB] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xDC] = [](Processor* p) {
-
+		p->CALL(0x03, p->Get16BitImmediate());
 	};
 
 	(*operations)[0xDD] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xDE] = [](Processor* p) {
-
+		p->SBC(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xDF] = [](Processor* p) {
-
+		p->RST(0x03);
 	};
 
 //---------------------------------------------------------------------
 
 	(*operations)[0xE0] = [](Processor* p) {
-
+		//LDH (n), A
 	};
 
 	(*operations)[0xE1] = [](Processor* p) {
-
+		p->Pop(p->H, p->L);
 	};
 
 	(*operations)[0xE2] = [](Processor* p) {
-
+		//LDH (C), A
 	};
 
 	(*operations)[0xE3] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xE4] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xE5] = [](Processor* p) {
-
+		p->Push(p->H, p->L);
 	};
 
 	(*operations)[0xE6] = [](Processor* p) {
-
+		p->AND(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xE7] = [](Processor* p) {
-
+		p->RST(0x04);
 	};
 
 	(*operations)[0xE8] = [](Processor* p) {
-
+		p->ADDSP(p->Get8BitImmediate());
 	};
 
 	(*operations)[0xE9] = [](Processor* p) {
@@ -1075,27 +1059,27 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xEA] = [](Processor* p) {
-
+		//LD (nn), A
 	};
 
 	(*operations)[0xEB] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xEC] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xED] = [](Processor* p) {
-
+		//XXX
 	};
 
 	(*operations)[0xEE] = [](Processor* p) {
-
+		p->XOR(p->A, p->Get8BitImmediate());
 	};
 
 	(*operations)[0xEF] = [](Processor* p) {
-
+		p->RST(0x05);
 	};
 
 //---------------------------------------------------------------------
@@ -1104,49 +1088,49 @@ void Processor::InitOpcodes()
 		//LDH A,(n)
 	};
 	(*operations)[0xF1] = [](Processor* p) {
-		//p->Pop(p->SP, p->A, p->F);
+		p->Pop(p->A, p->F);
 	};
 	(*operations)[0xF2] = [](Processor* p) {
-		//RST XX
+		//XXX
 	};
 	(*operations)[0xF3] = [](Processor* p) {
-		//RST DI
+		p->DI();
 	};
 	(*operations)[0xF4] = [](Processor* p) {
-		//RST XX
+		//XXX
 	};
 	(*operations)[0xF5] = [](Processor* p) {
-		//RST PUSH AF
+		p->Push(p->A, p->F);
 	};
 	(*operations)[0xF6] = [](Processor* p) {
-		//RST OR n
+		p->OR(p->A, p->Get8BitImmediate());
 	};
 	(*operations)[0xF7] = [](Processor* p) {
-		//RST 38
+		p->RST(0x06);
 	};
 	(*operations)[0xF8] = [](Processor* p) {
-		//RST 38
+		//LDHL SP, d
 	};
 	(*operations)[0xF9] = [](Processor* p) {
-		//RST 38
+		//LD SP, HL
 	};
 	(*operations)[0xFA] = [](Processor* p) {
-		//RST 38
+		//LD A, (nn)
 	};
 	(*operations)[0xFB] = [](Processor* p) {
-		//RST 38
+		p->EI();
 	};
 	(*operations)[0xFC] = [](Processor* p) {
-		//RST 38
+		//XXX
 	};
 	(*operations)[0xFD] = [](Processor* p) {
-		//RST 38
+		//XXX
 	};
 	(*operations)[0xFE] = [](Processor* p) {
-		//RST 38
+		p->CP(p->A, p->Get8BitImmediate());
 	};
 	(*operations)[0xFF] = [](Processor* p) {
-		//RST 38
+		p->RST(0x07);
 	};
 
     cboperations = new std::unordered_map<uint8_t, std::function<void(Processor* p)>>();

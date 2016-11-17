@@ -252,13 +252,13 @@ this->T->SetByte(0, 0x08);
 subtracted from SP and the contents of the higherportion of xy are placed on
 the stack. The contents of the lower portion of qq are then placed on the
 stack. The contents of SP are automatically decremented by 2.*/
-void Processor::Push(Register* SP, Register* X, Register* Y) {
-	uint16_t temp = SP->GetWord(0);
+void Processor::Push(Register* X, Register* Y) {
+	uint16_t temp = this->SP->GetWord(0);
 	temp--;
 	this->memory->SetByte(temp, X->GetByte(0));
 	temp--;
 	this->memory->SetByte(temp, Y->GetByte(0));
-	SP->SetWord(0, temp);
+	this->SP->SetWord(0, temp);
 	this->M->SetByte(0, 0x03);
 	this->T->SetByte(0, 0x12);
 }
@@ -268,13 +268,13 @@ the contents of memory, specified by the contents of SP are loaded in the
 lower portion of qq. Next, the contents of SP are incremented by 1 and the
 contents of the memory they specify are loaded in the upper portion of qq.
 The contents of SP are automatically incremented by 2.*/
-void Processor::Pop(Register* SP, Register* X, Register* Y) {
-	uint16_t temp = SP->GetWord(0);
+void Processor::Pop(Register* X, Register* Y) {
+	uint16_t temp = this->SP->GetWord(0);
 	Y->SetByte(0, this->memory->GetByte(temp));
 	temp++;
 	X->SetByte(0, this->memory->GetByte(temp));
 	temp++;
-	SP->SetWord(0, temp);
+	this->SP->SetWord(0, temp);
 	this->M->SetByte(0, 0x03);
 	this->T->SetByte(0, 0x12);
 }
@@ -336,7 +336,7 @@ uint8_t Processor::ADDHelper(bool cin, uint8_t firstByte, uint8_t secondByte) {
 	uint8_t sum = firstByte + secondByte;
 	this->Trash8->SetByte(0, firstByte);
 	this->Trash8_2->SetByte(0, secondByte);
-	bool a = cin, b = 0, c = 0, d = 0;
+	bool a = cin, b = false, c = false, d = false;
 	for (int i = 0; i < 8; i++) {
 		a = this->carry(a, this->Trash16->GetBit(i), this->Trash8->GetBit(i));
 		if (i == 3) {
@@ -355,7 +355,7 @@ uint16_t Processor::ADDHelper16(bool cin, uint16_t firstWord, uint16_t secondWor
 	uint16_t sum = firstWord + secondWord;
 	this->Trash16->SetWord(0, firstWord);
 	this->Trash16_2->SetWord(0, secondWord);
-	bool a = cin, b = 0, c = 0, d = 0;
+	bool a = cin, b = false, c = false, d = false;
 	for (int i = 0; i < 16; i++) {
 		a = this->carry(a, this->Trash16->GetBit(i), this->Trash16_2->GetBit(i));
 		if (i == 11) {
@@ -374,7 +374,7 @@ uint8_t Processor::SUBHelper(bool cin, uint8_t firstByte, uint8_t secondByte) {
 	uint8_t sum = firstByte - secondByte;
 	this->Trash8->SetByte(0, firstByte);
 	this->Trash8_2->SetByte(0, secondByte);
-	bool a = cin, b = 1, c = 0, d = 0;
+	bool a = cin, b = true, c = false, d = false;
 	for (int i = 0; i < 8; i++) {
 		c = this->borrow(c, this->Trash8->GetBit(i), this->Trash8_2->GetBit(i));
 		if (i == 3) {
@@ -393,7 +393,7 @@ uint16_t Processor::SUBHelper16(bool cin, uint16_t firstWord, uint16_t secondWor
 	uint16_t sum = firstWord - secondWord;
 	this->Trash16->SetWord(0, firstWord);
 	this->Trash16_2->SetWord(0, secondWord);
-	bool a = cin, b = 1, c = 0, d = 0;
+	bool a = cin, b = true, c = false, d = false;
 	for (int i = 0; i < 16; i++) {
 		c = this->borrow(c, this->Trash16->GetBit(i), this->Trash16_2->GetBit(i));
 		if (i == 11) {
@@ -410,14 +410,14 @@ uint16_t Processor::SUBHelper16(bool cin, uint16_t firstWord, uint16_t secondWor
 
 uint8_t Processor::ANDHelper(uint8_t firstByte, uint8_t secondByte) {
 	uint8_t sum = firstByte & secondByte;
-	bool a = (sum == 0), b = 1, c = 0, d = 0;
+	bool a = (sum == 0), b = true, c = false, d = false;
 	this->FlagSetter(a, b, c, d);
 	return sum;
 }
 
 uint8_t Processor::ORHelper(uint8_t firstByte, uint8_t secondByte) {
 	uint8_t sum = firstByte | secondByte;
-	bool a = (sum == 0), b = 0, c = 0, d = 0;
+	bool a = (sum == 0), b = false, c = false, d = false;
 	this->FlagSetter(a, b, c, d);
 	return sum;
 }
@@ -429,7 +429,7 @@ uint8_t Processor::XORHelper(uint8_t firstByte, uint8_t secondByte) {
 		this->Trash8->SetBit(i, (this->Trash8->GetBit(i) != this->Trash8_2->GetBit(i)));
 	}
 	uint8_t sum = this->Trash8->GetByte(0);
-	bool a = (sum == 0), b = 0, c = 0, d = 0;
+	bool a = (sum == 0), b = false, c = false, d = false;
 	this->FlagSetter(a, b, c, d);
 	return sum;
 }
@@ -438,7 +438,7 @@ void Processor::CPHelper(uint8_t firstByte, uint8_t secondByte) {
 	uint8_t sum = firstByte - secondByte;
 	this->Trash16->SetWord(0, firstByte);
 	this->Trash16_2->SetWord(0, secondByte);
-	bool a = 0, b = 1, c = 0, d = 0;
+	bool a = false, b = true, c = false, d = false;
 	for (int i = 0; i < 16; i++) {
 		a = this->borrow(a, this->Trash16->GetBit(i), this->Trash16_2->GetBit(i));
 		if (i == 3) {
@@ -633,7 +633,7 @@ void Processor::DEC(Register* X) {
 	this->T->SetByte(0, 0x04);
 }
 
-void Processor::DEC(Register* X, Register* Y) {
+void Processor::DEC(Register* H, Register* L) {
 	this->ToMemory(H, L, this->SUBHelper(false, this->FromMemory(H, L), 0x01));
 	this->M->SetByte(0, 0x03);
 	this->T->SetByte(0, 0x0C);
@@ -650,23 +650,35 @@ void Processor::ADDPairs(Register* X, Register* Y, Register* Z, Register* W) {
 	this->T->SetByte(0, 0x08);
 }
 
-void Processor::ADDSP(Register* SP, uint8_t n) {
-	SP->SetWord(0, this->ADDHelper16(false, SP->GetWord(0), this->ByteToWord(n)));
+void Processor::ADDSP(int8_t n) {
+	if (n >= 0) {
+		this->SP->SetWord(0, this->ADDHelper16(false, this->SP->GetWord(0), this->ByteToWord((uint8_t)n & 0x7F)));
+		this->ZeroFlag = false;
+		this->SubtractionFlag = false;
+	} else {
+		this->SP->SetWord(0, this->SUBHelper16(false, this->SP->GetWord(0), this->ByteToWord((uint8_t)n & 0x7F)));
+		this->ZeroFlag = false;
+		this->SubtractionFlag = false;
+	}
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
 }
 
 void Processor::INCPair(Register* X, Register* Y) {
-	this->ToRegisterPair(X, Y, (this->ADDHelper16(false, this->RegisterPairContents(X, Y), 0x0001)));
+	this->ToRegisterPair(X, Y, this->RegisterPairContents(X, Y) + 1);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
 
 void Processor::DECPair(Register* X, Register* Y) {
-	this->ToRegisterPair(X, Y, (this->SUBHelper16(false, this->RegisterPairContents(X, Y), 0x0001)));
+	this->ToRegisterPair(X, Y, this->RegisterPairContents(X, Y) - 1);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
+
+
+
+
 
 //----------------------------------------------------------------------------
 
@@ -677,6 +689,7 @@ void Processor::RLCA() {
 		this->A->SetBit(i,this->A->GetBit(i-1));
 	}
 	this->A->SetBit(0, c);
+	this->ZeroFlag = (this->A->GetByte(0) == 0);
 	this->M->SetByte(0, 0x01);
 	this->T->SetByte(0, 0x04);
 }
@@ -688,6 +701,7 @@ void Processor::RLA() {
 		this->A->SetBit(i, this->A->GetBit(i - 1));
 	}
 	this->A->SetBit(0, c);
+	this->ZeroFlag = (this->A->GetByte(0) == 0);
 	this->M->SetByte(0, 0x01);
 	this->T->SetByte(0, 0x04);
 }
@@ -699,6 +713,7 @@ void Processor::RRCA() {
 		this->A->SetBit(i, this->A->GetBit(i + 1));
 	}
 	this->A->SetBit(7, c);
+	this->ZeroFlag = (this->A->GetByte(0) == 0);
 	this->M->SetByte(0, 0x01);
 	this->T->SetByte(0, 0x04);
 }
@@ -710,6 +725,7 @@ void Processor::RRA() {
 		this->A->SetBit(i, this->A->GetBit(i + 1));
 	}
 	this->A->SetBit(7, c);
+	this->ZeroFlag = (this->A->GetByte(0)==0);
 	this->M->SetByte(0, 0x01);
 	this->T->SetByte(0, 0x04);
 }
@@ -721,6 +737,7 @@ void Processor::RLC(Register* X) {
 		X->SetBit(i, X->GetBit(i - 1));
 	}
 	X->SetBit(0, c);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -733,6 +750,7 @@ void Processor::RLC(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i - 1));
 	}
 	this->Trash8->SetBit(0, c);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -746,6 +764,7 @@ void Processor::RL(Register* X) {
 		X->SetBit(i, X->GetBit(i - 1));
 	}
 	X->SetBit(0, c);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -757,6 +776,7 @@ void Processor::RL(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i - 1));
 	}
 	this->Trash8->SetBit(0, c);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -770,6 +790,7 @@ void Processor::RRC(Register* X) {
 		X->SetBit(i, X->GetBit(i + 1));
 	}
 	X->SetBit(7, c);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -783,6 +804,7 @@ void Processor::RRC(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i + 1));
 	}
 	this->Trash8->SetBit(0, c);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -795,6 +817,7 @@ void Processor::RR(Register* X) {
 		X->SetBit(i, X->GetBit(i + 1));
 	}
 	X->SetBit(7, c);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -808,6 +831,7 @@ void Processor::RR(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i + 1));
 	}
 	this->Trash8->SetBit(0, c);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -819,6 +843,7 @@ void Processor::SLA(Register* X) {
 		X->SetBit(i, X->GetBit(i - 1));
 	}
 	X->SetBit(0, false);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -830,6 +855,7 @@ void Processor::SLA(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i - 1));
 	}
 	this->Trash8->SetBit(0, false);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -841,6 +867,7 @@ void Processor::SRA(Register* X) {
 	for (int i = 0; i < 7; i++) {
 		X->SetBit(i, X->GetBit(i+1));
 	}
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -851,6 +878,7 @@ void Processor::SRA(Register* H, Register* L) {
 	for (int i = 0; i < 7; i++) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i + 1));
 	}
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -862,6 +890,7 @@ void Processor::SRL(Register* X) {
 		X->SetBit(i, X->GetBit(i + 1));
 	}
 	X->SetBit(7, false);
+	this->ZeroFlag = (X->GetByte(0) == 0);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -873,6 +902,7 @@ void Processor::SRL(Register* H, Register* L) {
 		this->Trash8->SetBit(i, this->Trash8->GetBit(i + 1));
 	}
 	this->Trash8->SetBit(7, false);
+	this->ZeroFlag = (this->Trash8->GetByte(0) == 0);
 	this->ToMemory(H, L, this->Trash8->GetByte(0));
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
@@ -883,6 +913,7 @@ void Processor::SWAP(Register* X) {
 	uint8_t temp2 = (X->GetByte(0) & 0x0F)<<4;
 	uint8_t result = temp1 + temp2;
 	X->SetByte(0, result);
+	this->FlagSetter((result == 0), false, false, false);
 	this->M->SetByte(0, 0x02);
 	this->T->SetByte(0, 0x08);
 }
@@ -893,6 +924,7 @@ void Processor::SWAP(Register* H, Register* L) {
 	uint8_t temp2 = (this->Trash8->GetByte(0) & 0x0F) << 4;
 	uint8_t result = temp1 + temp2;
 	this->ToMemory(H, L, result);
+	this->FlagSetter((result == 0), false, false, false);
 	this->M->SetByte(0, 0x04);
 	this->T->SetByte(0, 0x10);
 }
@@ -1027,7 +1059,7 @@ void Processor::JP(Register* H, Register* L) {
 void Processor::CALL(uint16_t nn) {
 	this->Trash8->SetByte(0, this->PC->GetByte(1));
 	this->Trash8_2->SetByte(0, this->PC->GetByte(0));
-	Push(this->SP, this->Trash8, this->Trash8_2);
+	Push(this->Trash8, this->Trash8_2);
 	this->PC->SetWord(0, nn);
 	this->SP->SetWord(0, this->SP->GetWord(0) - 2);
 	this->M->SetByte(0, 0x06);
@@ -1038,7 +1070,7 @@ void Processor::CALL(uint8_t cc, uint16_t nn) {
 	if (this->JumpConditions(cc)) {
 		this->Trash8->SetByte(0, this->PC->GetByte(1));
 		this->Trash8_2->SetByte(0, this->PC->GetByte(0));
-		Push(this->SP, this->Trash8, this->Trash8_2);
+		Push(this->Trash8, this->Trash8_2);
 		this->PC->SetWord(0, nn);
 		this->SP->SetWord(0, this->SP->GetWord(0) - 2);
 		this->M->SetByte(0, 0x06);
@@ -1051,13 +1083,127 @@ void Processor::CALL(uint8_t cc, uint16_t nn) {
 }
 
 void Processor::RET() {
-	this->Pop(this->SP, this->Trash8, this->Trash8_2);
+	this->Pop(this->Trash8, this->Trash8_2);
 	this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
 	this->SP->SetWord(0, this->SP->GetWord(0) + 2);
+	this->M->SetByte(0, 0x04);
+	this->M->SetByte(0, 0x10);
+}
+
+void Processor::RET(uint8_t cc){
+	if (this->JumpConditions(cc)) {
+		this->Pop(this->Trash8, this->Trash8_2);
+		this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
+		this->SP->SetWord(0, this->SP->GetWord(0) + 2);
+		this->M->SetByte(0, 0x05);
+		this->M->SetByte(0, 0x14);
+	}
+	else {
+		this->M->SetByte(0, 0x02);
+		this->M->SetByte(0, 0x08);
+	}
+}
+
+void Processor::RETI() {
+	this->Pop(this->Trash8, this->Trash8_2);
+	this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
+	this->SP->SetWord(0, this->SP->GetWord(0) + 2);
+	this->M->SetByte(0, 0x04);
+	this->M->SetByte(0, 0x10);
+}
+
+void Processor::RST(uint8_t n) {
+	this->Trash8->SetByte(0, this->PC->GetByte(1));
+	this->Trash8_2->SetByte(0, this->PC->GetByte(0));
+	Push(this->Trash8, this->Trash8_2);
+	this->SP->SetWord(0, this->SP->GetWord(0) - 2);
+	this->PC->SetByte(1, 0x00);
+	this->PC->SetByte(0, (n * 8));
+	this->M->SetByte(0, 0x04);
+	this->M->SetByte(0, 0x10);
+}
+
+////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+void Processor::DAA() {
+	this->CarryFlag = (this->A->GetByte(0) == 0);
+	uint8_t higher = (this->A->GetByte(0) >> 4) & 0x0F;
+	uint8_t lower = this->A->GetByte(0) & 0x0F;
+	if (this->SubtractionFlag) {
+		if (this->CarryFlag) {
+			if (this->HalfCarryFlag) {
+				this->A->SetByte(0, this->A->GetByte(0) + 0x9A);
+			}else{
+				this->A->SetByte(0, this->A->GetByte(0) + 0xA0);
+			}
+		}
+		else {
+			if (this->HalfCarryFlag) {
+				this->A->SetByte(0, this->A->GetByte(0) + 0xFA);
+			}
+			else {
+				this->A->SetByte(0, this->A->GetByte(0) + 0x00);
+			}
+		}
+	}
+	else {
+		if (this->CarryFlag) {
+			if (this->HalfCarryFlag) {
+				this->A->SetByte(0, this->A->GetByte(0) + 0x66);
+			}
+			else {
+				if (lower > 9) {
+					this->A->SetByte(0, this->A->GetByte(0) + 0x66);
+				}else{
+					this->A->SetByte(0, this->A->GetByte(0) + 0x60);
+				}
+			}
+		}
+		else {
+			if (this->HalfCarryFlag) {
+				if (higher > 9) {
+					this->A->SetByte(0, this->A->GetByte(0) + 0x66);
+					this->CarryFlag = true;
+				}else{
+					this->A->SetByte(0, this->A->GetByte(0) + 0x06);
+				}
+			}
+			else {
+				if (higher > 9) {
+					this->CarryFlag = true;
+					if (lower > 9) {
+						this->A->SetByte(0, this->A->GetByte(0) + 0x66);
+					}else{
+						this->A->SetByte(0, this->A->GetByte(0) + 0x60);
+					}
+				}
+				else{
+					if (lower > 9) {
+						this->A->SetByte(0, this->A->GetByte(0) + 0x06);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Processor::CPL() {
+	for (int i = 0; i < 8; i++) {
+		this->A->SetBit(i, !this->A->GetBit(i));
+	}
+	this->FlagSetter(this->CarryFlag, true, true, this->ZeroFlag);
+	this->M->SetByte(0, 0x01);
+	this->M->SetByte(0, 0x04);
+}
+
+void Processor::CCF() {
+	this->FlagSetter(!this->CarryFlag, false, false, this->ZeroFlag);
+	this->M->SetByte(0, 0x01);
+	this->M->SetByte(0, 0x04);
 }
 
 void Processor::SCF() {
-	this->F->SetByte(0, this->F->GetByte(0) | 0x10);
+	this->FlagSetter(true, false, false, this->ZeroFlag);
 	this->M->SetByte(0, 0x01);
 	this->M->SetByte(0, 0x04);
 }

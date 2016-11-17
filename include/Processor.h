@@ -172,14 +172,14 @@ public:
         subtracted from SP and the contents of the higherportion of qq are placed on
         the stack. The contents of the lower portion of qq are then placed on the
         stack. The contents of SP are automatically decremented by 2.*/
-        void Push(Register* SP, Register* X, Register* Y);
+        void Push(Register* X, Register* Y);
 
         /*Pops the contents from the memory stack and into register pair qq. First
         the contents of memory, specified by the contents of SP are loaded in the
         lower portion of qq. Next, the contents of SP are incremented by 1 and the
         contents of the memory they specify are loaded in the upper portion of qq.
         The contents of SP are automatically incremented by 2.*/
-        void Pop(Register* SP, Register* X, Register* Y);
+        void Pop(Register* X, Register* Y);
 
     /*
     /   Arithmetic and Logical Instructions
@@ -247,15 +247,15 @@ public:
 		void CP(Register* X, Register* H, Register* L);
 
 		void INC(Register* X);
-		void INC(Register* X, Register* Y);
+		void INC(Register* H, Register* L);
 
 		void DEC(Register* X);
-		void DEC(Register* X, Register* Y);
+		void DEC(Register* H, Register* L);
 
 		//16-bit
 
 		void ADDPairs(Register* X, Register* Y, Register* Z, Register* W);
-		void ADDSP(Register* SP, uint8_t n);
+		void ADDSP(int8_t n);
 		void INCPair(Register* X, Register* Y);
 		void DECPair(Register* X, Register* Y);
 
@@ -323,19 +323,15 @@ public:
 
 	//Pop two bytes from stack and jump to that address.
 	void RET();
-
-//	void RETI();
-//	void RET();
-//	void RST(uint8_t t);
+	void RET(uint8_t cc);
+	void RETI();
+	void RST(uint8_t t);
 
 	/////////////////////////////////////////////////////////
 
 	void DAA();
 	void CPL();
-
-
     void CCF();
-
     void SCF();
 
     void NOP();
