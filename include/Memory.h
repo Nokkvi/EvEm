@@ -9,8 +9,9 @@ class Memory
 {
     private:
         GPU* gpu;
-        bool inBIOS;
-        uint8_t storage[65535];
+        bool inBIOS, ramOn, mode;
+        uint8_t bios[0xFF], wram[0x2000], eram[0x8000], rom[128 * 0x1FFF], zram[0x800];
+        unsigned int romOffset, ramOffset, cartType, ie, interruptFlags, romBank, ramBank;
     public:
         Memory(GPU* gpu);
         virtual ~Memory();
@@ -19,6 +20,8 @@ class Memory
         {
             inBIOS = on;
         };
+
+        void Reset();
 
         void LoadBIOS(std::string path);
         void LoadROM(std::string path);
