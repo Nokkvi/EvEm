@@ -27,7 +27,7 @@ uint8_t Memory::GetByte(uint16_t index)
         }
     }
 
-    return storage[Indexer(index)];
+    return storage[index];
 };
 
 uint16_t Memory::GetWord(uint16_t index)
