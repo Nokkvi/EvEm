@@ -17,7 +17,26 @@ void Processor::ProcessOpcode(uint8_t code)
 
     unsigned int m = 0, t = 0;
     (*operations)[code](this);
-    (*cboperations)[code](this);
+    if (this->cbInstruction)
+    {
+        this->cbInstruction = false;
+        uint8_t code = FetchInstruction();
+
+        uint8_t temp = this->PC->GetByte(0);
+        if (temp == 0xFF)
+        {
+            this->PC->SetByte(0, 0x00);
+            temp = this->PC->GetByte(1);
+            if (temp == 0xFF)
+                this->PC->SetByte(1, 0x00);
+            else
+                this->PC->SetByte(1, temp + 1);
+        }
+        else
+            this->PC->SetByte(0, temp + 1);
+
+        (*cboperations)[code](this);
+    }
     this->mTotal += m;
     this->tTotal += t;
     this->M->SetByte(0, m);
@@ -129,7 +148,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x0F] = [](Processor* p) {
         p->RRC(p->A);
     };
-
     (*cboperations)[0x10] = [](Processor* p) {
         p->RL(p->B);
     };
@@ -178,7 +196,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x1F] = [](Processor* p) {
         p->RR(p->A);
     };
-
     (*cboperations)[0x20] = [](Processor* p) {
         p->SLA(p->B);
     };
@@ -227,7 +244,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x2F] = [](Processor* p) {
         p->SRA(p->A);
     };
-
     (*cboperations)[0x30] = [](Processor* p) {
         p->SWAP(p->B);
     };
@@ -276,8 +292,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x3F] = [](Processor* p) {
         p->SRL(p->A);
     };
-
-
     (*cboperations)[0x40] = [](Processor* p) {
         p->BIT(0, p->B);
     };
@@ -326,8 +340,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x4F] = [](Processor* p) {
         p->BIT(1, p->A);
     };
-
-
     (*cboperations)[0x50] = [](Processor* p) {
         p->BIT(2, p->B);
     };
@@ -425,7 +437,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x6F] = [](Processor* p) {
         p->BIT(5, p->A);
     };
-
     (*cboperations)[0x70] = [](Processor* p) {
         p->BIT(6, p->B);
     };
@@ -474,7 +485,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x7F] = [](Processor* p) {
         p->BIT(7, p->A);
     };
-
     (*cboperations)[0x80] = [](Processor* p) {
         p->RES(0, p->B);
     };
@@ -523,7 +533,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x8F] = [](Processor* p) {
         p->RES(1, p->A);
     };
-
     (*cboperations)[0x90] = [](Processor* p) {
         p->RES(2, p->B);
     };
@@ -572,7 +581,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0x9F] = [](Processor* p) {
         p->RES(3, p->A);
     };
-
     (*cboperations)[0xA0] = [](Processor* p) {
         p->RES(4, p->B);
     };
@@ -621,7 +629,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0xAF] = [](Processor* p) {
         p->RES(5, p->A);
     };
-
     (*cboperations)[0xB0] = [](Processor* p) {
         p->RES(6, p->B);
     };
@@ -670,7 +677,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0xBF] = [](Processor* p) {
         p->RES(7, p->A);
     };
-
     (*cboperations)[0xC0] = [](Processor* p) {
         p->SET(0, p->B);
     };
@@ -719,7 +725,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0xCF] = [](Processor* p) {
         p->SET(1, p->A);
     };
-
     (*cboperations)[0xD0] = [](Processor* p) {
         p->SET(2, p->B);
     };
@@ -768,7 +773,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0xDF] = [](Processor* p) {
         p->SET(3, p->A);
     };
-
     (*cboperations)[0xE0] = [](Processor* p) {
         p->SET(4, p->B);
     };
@@ -817,7 +821,6 @@ void Processor::InitOpcodes()
     (*cboperations)[0xEF] = [](Processor* p) {
         p->SET(5, p->A);
     };
-
     (*cboperations)[0xF0] = [](Processor* p) {
         p->SET(6, p->B);
     };

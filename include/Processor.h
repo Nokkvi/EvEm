@@ -28,6 +28,8 @@ public:
 
     unsigned int mTotal, tTotal;
 
+    bool cbInstruction = false;
+
     uint16_t _halt, _stop, _ime;
 private:
     std::unordered_map<uint8_t, std::function<void(Processor* p)>>* operations;

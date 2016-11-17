@@ -862,7 +862,7 @@ void Processor::SRL(){
     uint16_t HL = this->H->GetByte(0) << 8;
     HL += this->L->GetByte(0);
     uint8_t HLmem = this->memory->GetByte(HL);
-    uint16_t co = HLmem&1 ? 0x10 : 0;
+    uint16_t co = HLmem & 1 ? 0x10 : 0;
     uint16_t HLtemp = (HLmem>>1)&255;
     this->FlagHelper(HLtemp, 0);
     this->F->SetByte(0, (this->F->GetByte(0)&0xEF)+co);
@@ -914,11 +914,11 @@ void Processor::RES(uint8_t b){
 
 void Processor::DAA(){
     uint16_t a = this->A->GetByte(0);
-    if((this->F->GetByte(0)&0x20)||((this->A->GetByte(0)&15)>9));
+    if ((this->F->GetByte(0) & 0x20) || ((this->A->GetByte(0) & 15) > 9))
         this->A->SetByte(0, this->A->GetByte(0)+6);
-    this->F->SetByte(0, this->F->GetByte(0)&0xEF);
+    this->F->SetByte(0, this->F->GetByte(0) & 0xEF);
     if((this->F->GetByte(0)&0x20)||(a>0x99)){
-        this->A->SetByte(0, this->A->GetByte(0)+0x60);
+        this->A->SetByte(0, this->A->GetByte(0) + 0x60);
         this->F->SetByte(0, this->F->GetByte(0)|0x10);
     }
     this->M->SetByte(0, 0x01);
