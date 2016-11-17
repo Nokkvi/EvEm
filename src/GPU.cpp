@@ -3,13 +3,9 @@
 GPU::GPU()
 {
     screen = new Screen(160, 144);
-    pal = new Register(2);
     scx = new Register(1);
     scy = new Register(1);
     tileset = new uint8_t**[384];
-
-    oam = new uint8_t[160];
-    objectdata = new objdata[40];
 
     for (int i = 0; i < 384; i++)
     {
@@ -20,7 +16,6 @@ GPU::GPU()
         }
     }
 
-    vram = new uint8_t[0xFFFF];
     Reset();
 }
 
@@ -35,8 +30,6 @@ GPU::~GPU()
         delete[] tileset[i];
     }
     delete[] tileset;
-    delete[] vram;
-    delete pal;
     delete scx;
     delete scy;
     delete screen;
@@ -44,51 +37,149 @@ GPU::~GPU()
 
 uint8_t GPU::GetVram(uint16_t addr)
 {
-    switch (addr)
-    {
-        case 0xFF40:
-            return
-                this->switchBG ? 0x01 : 0x00 |
-                this->bgMap ? 0x08 : 0x00 |
-                this->bgTile ? 0x10 : 0x00 |
-                this->switchLCD ? 0x80 : 0x00;
-        case 0xFF42:
-            return this->scy->GetByte(0);
-        case 0xFF43:
-            return this->scx->GetByte(0);
-        default:
-            return line;
-    }
+    return this->vram[addr];
 }
 
 void GPU::SetVram(uint16_t addr, uint8_t value)
 {
-    switch (addr)
+    this->vram[addr] = value;
+}
+
+uint8_t GPU::GetOAM(uint16_t addr)
+{
+    return this->oam[addr];
+}
+
+void GPU::SetOAM(uint16_t addr, uint8_t value)
+{
+    this->oam[addr] = value;
+}
+
+uint8_t GPU::GetData(uint16_t addr)
+{
+    uint16_t gaddr = addr - 0xFF40;
+    switch(gaddr)
     {
-        case 0xFF40:
-            this->switchBG = (value & 0x01) != 0;
-            this->bgMap = (value & 0x08) != 0;
+        case 0:
+            return (this->switchLCD ? 0x80 : 0) |
+                ((this->bgTile) ? 0x10 : 0) |
+                ((this->bgMap) ? 0x08 : 0) |
+                (this->objSize ? 0x04 : 0) |
+                (this->switchObj ? 0x02 : 0) |
+                (this->switchBG ? 0x01 : 0);
+        case 1:
+            return (this->line == this->raster ? 4 : 0) | this->mode;
+        case 2:
+            return this->scy->GetByte(0);
+        case 3:
+            return this->scx->GetByte(0);
+        case 4:
+            return line;
+        case 5:
+            return this->raster;
+        default:
+            return this->reg[gaddr];
+    }
+}
+
+void GPU::SetData(uint16_t addr, uint8_t value)
+{
+    uint16_t gaddr = addr - 0xFF40;
+    switch(gaddr)
+    {
+        case 0:
+            this->switchLCD = (value & 0x80) != 0;
             this->bgTile = (value & 0x10) != 0;
-            this->switchLCD = (value & 0x85) != 0;
-            break;
-        case 0xFF42:
+            this->bgMap = (value & 0x08) != 0;
+            this->objSize = (value & 0x04) != 0;
+            this->switchObj = (value & 0x2) != 0;
+            this->switchBG = (value & 0x01) != 0;
+        case 2:
             this->scy->SetByte(0, value);
-            break;
-        case 0xFF43:
+        case 3:
             this->scx->SetByte(0, value);
-            break;
-        case 0xFF44:
-            uint8_t val = 0;
-            for (int i = 0; i < 4; i++)
+        case 5:
+            this->raster = value;
+        case 6:
+            int v;
+            for(int i = 0; i < 160; i++)
             {
-                // Adds the 2 bits required to say the color
-                // 0 = 255, 1 = 192, 2 = 96, 3 = 0
-                val = (val << 2) | (val >> (i * 2) & 3);
-                if (i % 2 == 1)
-                    this->pal->SetByte(i / 2, val);
+                v = ((value << 8) + i);
+                this->oam[i] = v;
+                this->UpdateOAM(0xFE00 + i);
+            }
+            break;
+        case 7:
+            for(int i = 0; i < 4; i++)
+            {
+                switch((value >> (i * 2)) & 3)
+                {
+                    case 0:
+                        this->paletteBG[i] = 255;
+                        break;
+                    case 1:
+                        this->paletteBG[i] = 192;
+                        break;
+                    case 2:
+                        this->paletteBG[i] = 96;
+                        break;
+                    case 3:
+                        this->paletteBG[i] = 0;
+                        break;
+                }
+            }
+            break;
+        case 8:
+            for(int i = 0; i < 4; i++)
+            {
+                switch((value >> (i * 2)) & 3)
+                {
+                case 0:
+                    this->paletteObj0[i] = 255;
+                    break;
+                case 1:
+                    this->paletteObj0[i] = 192;
+                    break;
+                case 2:
+                    this->paletteObj0[i] = 96;
+                    break;
+                case 3:
+                    this->paletteObj0[i] = 0;
+                    break;
+                }
+            }
+            break;
+        case 9:
+            for(int i = 0; i < 4; i++)
+            {
+                switch((value >> (i * 2)) & 3)
+                {
+                    case 0:
+                        this->paletteObj1[i] = 255;
+                        break;
+                    case 1:
+                        this->paletteObj1[i] = 192;
+                        break;
+                    case 2:
+                        this->paletteObj1[i] = 96;
+                        break;
+                    case 3:
+                        this->paletteObj1[i] = 0;
+                        break;
+                }
             }
             break;
     }
+}
+
+void GPU::UpdateTile(uint16_t addr)
+{
+
+}
+
+void GPU::UpdateOAM(uint16_t addr)
+{
+
 }
 
 void GPU::Render()
@@ -113,14 +204,14 @@ void GPU::Reset()
         this->oam[n+1] = 0;
         this->oam[n+2] = 0;
         this->oam[n+3] = 0;
-        this->objectdata[i].y = -16;
-        this->objectdata[i].x = -8;
-        this->objectdata[i].tile = 0;
-        this->objectdata[i].palette = 0;
-        this->objectdata[i].xflip = 0;
-        this->objectdata[i].yflip = 0;
-        this->objectdata[i].prio = 0;
-        this->objectdata[i].num = 1;
+        this->sprites[i].y = -16;
+        this->sprites[i].x = -8;
+        this->sprites[i].tile = 0;
+        this->sprites[i].palette = 0;
+        this->sprites[i].xflip = 0;
+        this->sprites[i].yflip = 0;
+        this->sprites[i].prio = 0;
+        this->sprites[i].num = i;
     }
 }
 
@@ -129,17 +220,23 @@ void GPU::buildobjdata(uint16_t address, uint8_t val){
     if(obj < 40){
         switch(address & 3){
             //Y-coord
-            case 0: this->objectdata[obj].y = val-16; break;
+            case 0:
+                this->sprites[obj].y = val-16;
+                break;
             //X-coord
-            case 1: this->objectdata[obj].x = val-8; break;
+            case 1:
+                this->sprites[obj].x = val-8;
+                break;
             //Data tile
-            case 2: this->objectdata[obj].tile = val; break;
+            case 2:
+                this->sprites[obj].tile = val;
+                break;
             //Options
             case 3:
-                this->objectdata[obj].palette = (val & 0x10) ? 1 : 0;
-                this->objectdata[obj].xflip = (val & 0x20) ? 1 : 0;
-                this->objectdata[obj].yflip = (val & 0x40) ? 1 : 0;
-                this->objectdata[obj].prio = (val & 0x80) ? 1 : 0;
+                this->sprites[obj].palette = (val & 0x10) ? 1 : 0;
+                this->sprites[obj].xflip = (val & 0x20) ? 1 : 0;
+                this->sprites[obj].yflip = (val & 0x40) ? 1 : 0;
+                this->sprites[obj].prio = (val & 0x80) ? 1 : 0;
                 break;
         }
     }
@@ -163,7 +260,7 @@ void GPU::Scanline()
     for (int i = 0; i < 160; i++)
     {
         uint8_t cindex = this->tileset[tile][y][x];
-        color = (this->pal->GetByte(cindex * 2) << 8) | this->pal->GetByte((cindex * 2) + 1);
+        color = (((uint16_t)this->paletteBG[cindex * 2 + 1]) << 8) | this->paletteBG[cindex * 2];
         canvasoffs++;
         x++;
 
