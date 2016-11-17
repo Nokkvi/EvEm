@@ -45,17 +45,19 @@ bool Application::Init()
 
     g = new GPU();
     m = new Memory(g);
-    //m->LoadBIOS("/home/BadWolf/Development/Repos/EvEm/bin/Debug/bios.bin");
-    //m->LoadROM("/home/BadWolf/Development/Repos/EvEm/bin/Debug/pkred.gb");
+    m->LoadBIOS("/home/BadWolf/Development/Repos/EvEm/bin/Debug/bios.bin");
+    m->LoadROM("/home/BadWolf/Development/Repos/EvEm/bin/Debug/pkred.gb");
     p = new Processor(g, m);
     k = new key();
+
+    p->InitOpcodes();
 
     return true;
 }
 
 void Application::Loop()
 {
-    while (p->IsRunning() || !glfwWindowShouldClose(window))
+    while (p->IsRunning() && !glfwWindowShouldClose(window))
     {
 
 		p->PC->SetByte(1, 0x00);
@@ -88,13 +90,13 @@ void Application::Frame()
 
 int main(void)
 {
-    
+
 	Application app("Test", 800, 600);
 
     if (!app.Init())
         return -1;
 
-	
+
 
     app.Loop();
 
