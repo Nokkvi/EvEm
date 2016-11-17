@@ -7,9 +7,6 @@ GPU::GPU()
     scy = new Register(1);
     tileset = new uint8_t**[384];
 
-    oam = new uint8_t[160];
-    objectdata = new objdata[40];
-
     for (int i = 0; i < 384; i++)
     {
         tileset[i] = new uint8_t*[8];
@@ -207,14 +204,14 @@ void GPU::Reset()
         this->oam[n+1] = 0;
         this->oam[n+2] = 0;
         this->oam[n+3] = 0;
-        this->objectdata[i].y = -16;
-        this->objectdata[i].x = -8;
-        this->objectdata[i].tile = 0;
-        this->objectdata[i].palette = 0;
-        this->objectdata[i].xflip = 0;
-        this->objectdata[i].yflip = 0;
-        this->objectdata[i].prio = 0;
-        this->objectdata[i].num = 1;
+        this->sprites[i].y = -16;
+        this->sprites[i].x = -8;
+        this->sprites[i].tile = 0;
+        this->sprites[i].palette = 0;
+        this->sprites[i].xflip = 0;
+        this->sprites[i].yflip = 0;
+        this->sprites[i].prio = 0;
+        this->sprites[i].num = i;
     }
 }
 
@@ -223,17 +220,23 @@ void GPU::buildobjdata(uint16_t address, uint8_t val){
     if(obj < 40){
         switch(address & 3){
             //Y-coord
-            case 0: this->objectdata[obj].y = val-16; break;
+            case 0:
+                this->sprites[obj].y = val-16;
+                break;
             //X-coord
-            case 1: this->objectdata[obj].x = val-8; break;
+            case 1:
+                this->sprites[obj].x = val-8;
+                break;
             //Data tile
-            case 2: this->objectdata[obj].tile = val; break;
+            case 2:
+                this->sprites[obj].tile = val;
+                break;
             //Options
             case 3:
-                this->objectdata[obj].palette = (val & 0x10) ? 1 : 0;
-                this->objectdata[obj].xflip = (val & 0x20) ? 1 : 0;
-                this->objectdata[obj].yflip = (val & 0x40) ? 1 : 0;
-                this->objectdata[obj].prio = (val & 0x80) ? 1 : 0;
+                this->sprites[obj].palette = (val & 0x10) ? 1 : 0;
+                this->sprites[obj].xflip = (val & 0x20) ? 1 : 0;
+                this->sprites[obj].yflip = (val & 0x40) ? 1 : 0;
+                this->sprites[obj].prio = (val & 0x80) ? 1 : 0;
                 break;
         }
     }

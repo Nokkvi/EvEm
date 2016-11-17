@@ -4,7 +4,7 @@
 #include "Definitions.h"
 #include "Register.h"
 #include "Screen.h"
-#include "objdata.h"
+#include "SpriteData.h"
 
 class GPU
 {
@@ -17,6 +17,7 @@ class GPU
         Register *scx, *scy;
         unsigned int clock;
         bool switchBG, bgMap, bgTile, switchLCD, objSize, switchObj;
+        SpriteData sprites[40];
     public:
         GPU();
         virtual ~GPU();
