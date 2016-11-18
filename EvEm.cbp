@@ -96,7 +96,6 @@
 		<Unit filename="src/Processor_opcodes.cpp" />
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/Screen.cpp" />
-		<Unit filename="src/SpriteData.cpp" />
 		<Unit filename="src/key.cpp" />
 		<Extensions>
 			<code_completion />
