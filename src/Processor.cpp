@@ -147,6 +147,35 @@ void Processor::Load_Increment(Register* r, Register* X, Register* Y) {
     this->T->SetByte(0, 0x08);
 }
 
+void Processor::LDAIOn(){
+    this->A->SetByte(0, this->memory->GetByte(0xFF00+this->Get8BitImmediate())));
+    this->M->SetByte(0, 0x03);
+    this->T->SetByte(0, 0x0C);
+}
+
+void Processor::LDIOCA(){
+    this->memory->SetByte(0xFF00+this->C->GetByte(0), this->A->GetByte(0));
+    this->M->SetByte(0, 0x02);
+    this->T->SetByte(0, 0x08);
+}
+
+void Processor::LDmmA(){
+    this->memory->SetByte(this->Get16BitImmediate(), this->A->GetByte(0));
+    this->M->SetByte(0, 0x04);
+    this->T->SetByte(0, 0x10);
+}
+
+void Processor::LDHLSPn(){
+    int byte = this->Get8BitImmediate();
+    if (byte > 127)
+        byte=-((~byte+1)&255);
+    byte+=this->SP->GetWord(0);
+    this->H->SetByte(0, byte >> 8);
+    this->L->SetByte(0, byte & 0xFF);
+    this->M->SetByte(0, 0x03);
+    this->T->SetByte(0, 0x0C);
+}
+
 
 // Loads into 16 bit register r the values in register pair XY, simultaneously decrement the contents of register pair XY.
 void Processor::Load_Decrement(Register* r, Register* X, Register* Y) {

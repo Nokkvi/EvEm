@@ -1031,7 +1031,7 @@ void Processor::InitOpcodes()
 //---------------------------------------------------------------------
 
 	(*operations)[0xE0] = [](Processor* p) {
-		//LDH (n), A
+		p->LDAIOn();
 	};
 
 	(*operations)[0xE1] = [](Processor* p) {
@@ -1039,7 +1039,7 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xE2] = [](Processor* p) {
-		//LDH (C), A
+		p->LDIOCA();
 	};
 
 	(*operations)[0xE3] = [](Processor* p) {
@@ -1071,7 +1071,7 @@ void Processor::InitOpcodes()
 	};
 
 	(*operations)[0xEA] = [](Processor* p) {
-		//LD (nn), A
+		p->LDmmA();
 	};
 
 	(*operations)[0xEB] = [](Processor* p) {
@@ -1121,7 +1121,7 @@ void Processor::InitOpcodes()
 		p->RST(0x06);
 	};
 	(*operations)[0xF8] = [](Processor* p) {
-		//LDHL SP, d
+		p->LDHLSPn();
 	};
 	(*operations)[0xF9] = [](Processor* p) {
 		//LD SP, HL

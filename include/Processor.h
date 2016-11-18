@@ -101,6 +101,14 @@ public:
             // Loads into 8 bit register r the contents of 8 bit register X.
             void Load(Register* r, Register* X);
 
+            void LDAIOn();
+
+            void LDIOCA();
+
+            void LDmmA();
+
+            void LDHLSPn();
+
             // Loads into register pair XY the immediate nn.
             void Load(Register* X, Register* Y, uint16_t nn);
 
