@@ -4,6 +4,7 @@ Processor::Processor(GPU* gpu, Memory* memory)
 {
 	this->gpu = gpu;
 	this->memory = memory;
+	this->Timari = new Timer(this);
 	//pMemory->SetProcessor(this);
 	//    InitOpcodes();
 
@@ -28,6 +29,7 @@ Processor::Processor(GPU* gpu, Memory* memory)
 
 Processor::~Processor()
 {
+    delete Timari;
     delete operations;
     delete A;
     delete B;

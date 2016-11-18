@@ -24,6 +24,8 @@ void Processor::ProcessOpcode(uint8_t code)
 
     this->mTotal += this->M->GetByte(0);
     this->tTotal += this->T->GetByte(0);
+
+    this->Timari->Inc();
     this->M->SetByte(0, 0);
     this->T->SetByte(0, 0);
 
@@ -36,6 +38,8 @@ void Processor::ProcessOpcode(uint8_t code)
     }
     this->mTotal += this->M->GetByte(0);
     this->mTotal += this->T->GetByte(0);
+
+    this->Timari->Inc();
 }
 
 
