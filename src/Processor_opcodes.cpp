@@ -24,6 +24,18 @@ void Processor::ProcessOpcode(uint8_t code)
 
     this->mTotal += this->M->GetByte(0);
     this->tTotal += this->T->GetByte(0);
+    this->M->SetByte(0, 0);
+    this->T->SetByte(0, 0);
+
+    if(this->_ime && this->memory->ie && this->memory->interruptFlags){
+        unsigned int ifired = (this->memory->ie & this->memory->interruptFlags);
+        if(ifired & 0x01){
+            this->memory->interruptFlags &= (255-0x01);
+            this->RST(0x40);
+        }
+    }
+    this->mTotal += this->M->GetByte(0);
+    this->mTotal += this->T->GetByte(0);
 }
 
 
@@ -80,7 +92,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x08] = [](Processor* p) {
-        p->Store(p->SP, p->Get16BitImmediate());        
+        p->Store(p->SP, p->Get16BitImmediate());
     };
 
     (*operations)[0x09] = [](Processor* p) {

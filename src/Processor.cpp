@@ -341,7 +341,7 @@ uint8_t Processor::ADDHelper(bool cin, uint8_t firstByte, uint8_t secondByte) {
 		a = this->carry(a, this->Trash16->GetBit(i), this->Trash8->GetBit(i));
 		if (i == 3) {
 			c = a;
-		}	
+		}
 		else if (i == 7) {
 			d = a;
 		}
@@ -1086,8 +1086,8 @@ void Processor::RET() {
 	this->Pop(this->Trash8, this->Trash8_2);
 	this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
 	this->SP->SetWord(0, this->SP->GetWord(0) + 2);
-	this->M->SetByte(0, 0x04);
-	this->M->SetByte(0, 0x10);
+	this->M->SetByte(0, 0x03);
+	this->T->SetByte(0, 0x0C);
 }
 
 void Processor::RET(uint8_t cc){
@@ -1096,31 +1096,33 @@ void Processor::RET(uint8_t cc){
 		this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
 		this->SP->SetWord(0, this->SP->GetWord(0) + 2);
 		this->M->SetByte(0, 0x05);
-		this->M->SetByte(0, 0x14);
+		this->T->SetByte(0, 0x14);
 	}
 	else {
 		this->M->SetByte(0, 0x02);
-		this->M->SetByte(0, 0x08);
+		this->T->SetByte(0, 0x08);
 	}
 }
 
 void Processor::RETI() {
+    this->_ime = 1;
 	this->Pop(this->Trash8, this->Trash8_2);
 	this->PC->SetWord(0, this->RegisterPairContents(this->Trash8, this->Trash8_2));
 	this->SP->SetWord(0, this->SP->GetWord(0) + 2);
 	this->M->SetByte(0, 0x04);
-	this->M->SetByte(0, 0x10);
+	this->T->SetByte(0, 0x10);
 }
 
 void Processor::RST(uint8_t n) {
+    this->_ime = 0;
 	this->Trash8->SetByte(0, this->PC->GetByte(1));
 	this->Trash8_2->SetByte(0, this->PC->GetByte(0));
 	Push(this->Trash8, this->Trash8_2);
 	this->SP->SetWord(0, this->SP->GetWord(0) - 2);
 	this->PC->SetByte(1, 0x00);
 	this->PC->SetByte(0, (n * 8));
-	this->M->SetByte(0, 0x04);
-	this->M->SetByte(0, 0x10);
+	this->M->SetByte(0, 0x03);
+	this->T->SetByte(0, 0x12);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1193,19 +1195,19 @@ void Processor::CPL() {
 	}
 	this->FlagSetter(this->CarryFlag, true, true, this->ZeroFlag);
 	this->M->SetByte(0, 0x01);
-	this->M->SetByte(0, 0x04);
+	this->T->SetByte(0, 0x04);
 }
 
 void Processor::CCF() {
 	this->FlagSetter(!this->CarryFlag, false, false, this->ZeroFlag);
 	this->M->SetByte(0, 0x01);
-	this->M->SetByte(0, 0x04);
+	this->T->SetByte(0, 0x04);
 }
 
 void Processor::SCF() {
 	this->FlagSetter(true, false, false, this->ZeroFlag);
 	this->M->SetByte(0, 0x01);
-	this->M->SetByte(0, 0x04);
+	this->T->SetByte(0, 0x04);
 }
 
 void Processor::STOP(){
