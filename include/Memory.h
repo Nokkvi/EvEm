@@ -11,8 +11,8 @@ class Memory
         GPU* gpu;
         bool inBIOS, ramOn, mode;
         uint8_t bios[0xFF], wram[0x2000], eram[0x8000], rom[128 * 0x1FFF], zram[0x800];
-        unsigned int romOffset, ramOffset, cartType, ie, interruptFlags, romBank, ramBank;
     public:
+        unsigned int romOffset, ramOffset, cartType, ie, interruptFlags, romBank, ramBank;
         Memory(GPU* gpu);
         virtual ~Memory();
 

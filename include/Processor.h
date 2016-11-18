@@ -7,10 +7,12 @@
 #include "Register.h"
 #include <unordered_map>
 #include <functional>
+#include "Timer.h"
 
 class Processor
 {
 public:
+    Timer* Timari;
     Register* A;
     Register* B;
     Register* C;

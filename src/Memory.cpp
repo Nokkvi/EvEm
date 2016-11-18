@@ -1,4 +1,5 @@
 #include "../include/Memory.h"
+#include "../include/Application.h"
 
 #include <iostream>
 #include <fstream>
@@ -110,7 +111,7 @@ uint8_t Memory::GetByte(uint16_t index)
                                 switch(index & 0xF)
                                 {
                                     case 0:
-                                        // return KEY.rb();
+                                        return Application::k->readByte(index);
                                     case 4:
                                     case 5:
                                     case 6:
@@ -232,7 +233,7 @@ void Memory::SetByte(uint16_t index, uint8_t value)
                                 switch(index & 0xF)
                                 {
                                     case 0:
-                                        //KEY.wb(val);
+                                        Application::k->writeByte(index, value);
                                         break;
                                     case 4:
                                     case 5:
