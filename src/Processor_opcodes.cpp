@@ -270,11 +270,10 @@ void Processor::InitOpcodes()
 
     (*operations)[0x31] = [](Processor* p) {
         p->Load(p->SP, p->Get16BitImmediate());
-
     };
 
     (*operations)[0x32] = [](Processor* p) {
-
+        p->Store_Decrement(p->A, p->H, p->L);
     };
 
     (*operations)[0x33] = [](Processor* p) {
@@ -297,8 +296,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x36] = [](Processor* p) {
-
-
+        p->Store(p->H, p->L, p->Get8BitImmediate());
     };
 
     (*operations)[0x37] = [](Processor* p) {
@@ -316,6 +314,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x3A] = [](Processor* p) {
+        p->LoadDecrement(p->A, p->H, p->L);
     };
 
     (*operations)[0x3B] = [](Processor* p) {
@@ -338,7 +337,7 @@ void Processor::InitOpcodes()
     };
 
     (*operations)[0x3E] = [](Processor* p) {
-
+        p->Load(p->A, p->Get8BitImmediate());
     };
 
     (*operations)[0x3F] = [](Processor* p) {
@@ -894,11 +893,8 @@ void Processor::InitOpcodes()
 
 //-----------------------------------------------------------
 
+
 	(*operations)[0xC0] = [](Processor* p) {
-
-	};
-
-	(*operations)[0xC1] = [](Processor* p) {
 		p->RET(0x00);
 	};
 
