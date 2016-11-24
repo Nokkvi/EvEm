@@ -4,6 +4,7 @@
 #include "Definitions.h"
 #include "Processor.h"
 #include "Memory.h"
+#include "key.h"
 #include <string>
 
 #define GLFW_INCLUDE_NONE
@@ -22,6 +23,8 @@ class Application
         std::string title;
         int width, height;
     public:
+        static key* k;
+
         Application(std::string title, int width, int height);
         ~Application();
 

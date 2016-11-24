@@ -1,5 +1,10 @@
 #include "../include/Application.h"
 
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    Application::k->handleKeys(key, action);
+}
+
 Application::Application(std::string title, int width, int height)
 {
     this->title = title;
@@ -12,6 +17,7 @@ Application::~Application()
     delete p;
     delete m;
     delete g;
+    delete k;
 
     glfwTerminate();
 }
@@ -28,6 +34,7 @@ bool Application::Init()
         return false;
     }
 
+    glfwSetKeyCallback(this->window, KeyCallback);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK)
     {
@@ -38,24 +45,33 @@ bool Application::Init()
 
     g = new GPU();
     m = new Memory(g);
+    m->LoadBIOS("/home/BadWolf/Development/Repos/EvEm/bin/Debug/bios.bin");
+    m->LoadROM("/home/BadWolf/Development/Repos/EvEm/bin/Debug/pkred.gb");
     p = new Processor(g, m);
+    k = new key();
+
+    p->InitOpcodes();
 
     return true;
 }
 
 void Application::Loop()
 {
-    while (p->IsRunning() || !glfwWindowShouldClose(window))
+    while (p->IsRunning() && !glfwWindowShouldClose(window))
     {
-        Frame();
-        this->g->Render();
-        glClear(GL_COLOR_BUFFER_BIT);
 
-        glBegin(GL_TRIANGLES);
+		p->PC->SetByte(1, 0x00);
+		p->PC->SetByte(0, (5 * 8));
+
+        Frame();
+        glClear(GL_COLOR_BUFFER_BIT);
+        this->g->Render();
+
+        /*glBegin(GL_TRIANGLES);
         glVertex2f(-1, -1);
         glVertex2f(0, 1);
         glVertex2f(1, -1);
-        glEnd();
+        glEnd();*/
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -74,10 +90,13 @@ void Application::Frame()
 
 int main(void)
 {
-    Application app("Test", 800, 600);
+
+	Application app("Test", 800, 600);
 
     if (!app.Init())
         return -1;
+
+
 
     app.Loop();
 

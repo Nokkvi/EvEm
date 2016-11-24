@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lGL" />
@@ -28,6 +29,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -45,6 +47,7 @@
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add library="opengl32" />
@@ -61,6 +64,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -83,6 +87,9 @@
 		<Unit filename="include/Processor.h" />
 		<Unit filename="include/Register.h" />
 		<Unit filename="include/Screen.h" />
+		<Unit filename="include/SpriteData.h" />
+		<Unit filename="include/Timer.h" />
+		<Unit filename="include/key.h" />
 		<Unit filename="src/Application.cpp" />
 		<Unit filename="src/GPU.cpp" />
 		<Unit filename="src/Memory.cpp" />
@@ -90,6 +97,8 @@
 		<Unit filename="src/Processor_opcodes.cpp" />
 		<Unit filename="src/Register.cpp" />
 		<Unit filename="src/Screen.cpp" />
+		<Unit filename="src/Timer.cpp" />
+		<Unit filename="src/key.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
